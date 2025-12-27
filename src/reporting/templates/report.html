@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Doctor - Data Quality Report</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .report-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .header {
+            border-bottom: 2px solid #1f77b4;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1f77b4;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header .meta {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .section h3 {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f77b4;
+        }
+
+        .summary-card .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .column-status-good {
+            color: #28a745;
+        }
+
+        .column-status-warning {
+            color: #ffc107;
+        }
+
+        .column-status-critical {
+            color: #dc3545;
+        }
+
+        .error-list {
+            background-color: #fff5f5;
+            border: 1px solid #f8d7da;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .error-list ul {
+            margin-left: 20px;
+        }
+
+        .error-list li {
+            margin-bottom: 5px;
+        }
+
+        .warning-list {
+            background-color: #fffbeb;
+            border: 1px solid #fff3cd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .warning-list ul {
+            margin-left: 20px;
+        }
+
+        .remediation-summary {
+            background-color: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s;
+        }
+
+        .progress-bar-fill.warning {
+            background-color: #ffc107;
+        }
+
+        .progress-bar-fill.danger {
+            background-color: #dc3545;
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+
+            .report-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>Data Quality Report</h1>
+            <div class="meta">
+                <p><strong>File:</strong> {{ filename }}</p>
+                <p><strong>Generated:</strong> {{ generated_at }}</p>
+                <p><strong>Contract ID:</strong> {{ contract_id }}</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Validation Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="value">{{ summary.total_rows | format_number }}</div>
+                    <div class="label">Total Rows</div>
+                </div>
+                <div class="summary-card">
+                    <div class="value">{{ summary.total_columns }}</div>
+                    <div class="label">Columns</div>
+                </div>
+                <div class="summary-card">
+                    <div class="value">{{ summary.tests_passed }} / {{ summary.tests_run }}</div>
+                    <div class="label">Tests Passed</div>
+                </div>
+                <div class="summary-card">
+                    <div class="value">{{ summary.clean_rows | format_number }}</div>
+                    <div class="label">Clean Rows</div>
+                </div>
+                <div class="summary-card">
+                    <div class="value">{{ summary.error_rate_percent }}%</div>
+                    <div class="label">Error Rate</div>
+                </div>
+                <div class="summary-card">
+                    <div class="value">
+                        {% if summary.is_valid %}
+                        <span class="status-badge status-pass">PASS</span>
+                        {% else %}
+                        <span class="status-badge status-fail">FAIL</span>
+                        {% endif %}
+                    </div>
+                    <div class="label">Overall Status</div>
+                </div>
+            </div>
+        </div>
+
+        {% if blocking_errors %}
+        <div class="section">
+            <h2>Blocking Errors</h2>
+            <div class="error-list">
+                <ul>
+                {% for error in blocking_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="section">
+            <h2>Column Results</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Data Type</th>
+                        <th>Tests Run</th>
+                        <th>Passed</th>
+                        <th>Failed</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for col_name, col_result in column_results.items() %}
+                    <tr>
+                        <td>{{ col_name }}</td>
+                        <td>{{ col_result.data_type }}</td>
+                        <td>{{ col_result.total_tests }}</td>
+                        <td>{{ col_result.passed_tests }}</td>
+                        <td>{{ col_result.failed_tests }}</td>
+                        <td>
+                            {% if col_result.overall_status == 'PASS' %}
+                            <span class="status-badge status-pass">PASS</span>
+                            {% elif col_result.overall_status == 'WARNING' %}
+                            <span class="status-badge status-warning">WARNING</span>
+                            {% else %}
+                            <span class="status-badge status-fail">FAIL</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if dataset_test_results %}
+        <div class="section">
+            <h2>Dataset-Level Tests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test Type</th>
+                        <th>Severity</th>
+                        <th>Result</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for test in dataset_test_results %}
+                    <tr>
+                        <td>{{ test.test_type }}</td>
+                        <td>{{ test.severity }}</td>
+                        <td>
+                            {% if test.passed %}
+                            <span class="status-badge status-pass">PASS</span>
+                            {% else %}
+                            <span class="status-badge status-fail">FAIL</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ test.message }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if fk_check_results %}
+        <div class="section">
+            <h2>Foreign Key Checks</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Check Name</th>
+                        <th>Dataset Column</th>
+                        <th>FK Column</th>
+                        <th>Missing Count</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for fk in fk_check_results %}
+                    <tr>
+                        <td>{{ fk.name }}</td>
+                        <td>{{ fk.dataset_column }}</td>
+                        <td>{{ fk.fk_column }}</td>
+                        <td>{{ fk.missing_count | format_number }}</td>
+                        <td>
+                            {% if fk.passed %}
+                            <span class="status-badge status-pass">PASS</span>
+                            {% else %}
+                            <span class="status-badge status-fail">FAIL</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if failed_examples %}
+        <div class="section">
+            <h2>Sample Failures</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Column</th>
+                        <th>Test</th>
+                        <th>Value</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for example in failed_examples %}
+                    <tr>
+                        <td>{{ example.row_index }}</td>
+                        <td>{{ example.column_name }}</td>
+                        <td>{{ example.test_type }}</td>
+                        <td>{{ example.original_value }}</td>
+                        <td>{{ example.error_message }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if remediation_summary %}
+        <div class="section">
+            <h2>Remediation Summary</h2>
+            <div class="remediation-summary">
+                <p><strong>Rows Changed:</strong> {{ remediation_summary.rows_changed | format_number }}</p>
+                <p><strong>Cells Changed:</strong> {{ remediation_summary.cells_changed | format_number }}</p>
+                <p><strong>Columns Affected:</strong> {{ remediation_summary.columns_affected | join(', ') }}</p>
+            </div>
+
+            {% if remediation_summary.sample_changes %}
+            <h3>Sample Changes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Column</th>
+                        <th>Original</th>
+                        <th>New</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for change in remediation_summary.sample_changes %}
+                    <tr>
+                        <td>{{ change.row_index }}</td>
+                        <td>{{ change.column_name }}</td>
+                        <td>{{ change.original_value }}</td>
+                        <td>{{ change.new_value }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>Generated by Data Doctor v{{ app_version }}</p>
+            <p>This report is for informational purposes. No data is stored by the application.</p>
+        </div>
+    </div>
+</body>
+</html>

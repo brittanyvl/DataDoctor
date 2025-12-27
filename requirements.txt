@@ -1,0 +1,18 @@
+# Data Doctor - Dependencies
+# For deployment on Streamlit Community Cloud
+
+# Core framework
+streamlit>=1.28.0
+
+# Data processing
+pandas>=2.0.0
+
+# Excel file support
+openpyxl>=3.1.0
+pyxlsb>=1.0.10
+
+# YAML contract handling
+pyyaml>=6.0
+
+# HTML report templating
+jinja2>=3.1.0
