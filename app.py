@@ -17,6 +17,7 @@ from src.constants import APP_NAME, APP_VERSION, APP_TAGLINE, UI_STEPS
 from src.session import initialize_session_state, get_current_step, set_current_step, consume_step_change
 from src.ui.components import progress_indicator, scroll_to_top_after_render
 from src.ui.theme import get_custom_css
+from src.ui.about import render_about_page
 from src.ui.privacy import render_privacy_page
 from src.ui.step_upload import render_step_upload
 from src.ui.step_contract import render_step_contract
@@ -50,6 +51,11 @@ def main():
     # Check for privacy page
     if st.session_state.get("show_privacy_page", False):
         render_privacy_page()
+        return
+
+    # Check for about page
+    if st.session_state.get("show_about_page", False):
+        render_about_page()
         return
 
     # Render page header with branding (green title, coal tagline)
@@ -114,6 +120,19 @@ def _render_sidebar():
                 'DEMO MODE</div>',
                 unsafe_allow_html=True,
             )
+
+        # Home button - returns to Step 1
+        if st.button("🏠 Home", use_container_width=True, help="Return to Step 1"):
+            st.session_state["show_privacy_page"] = False
+            st.session_state["show_about_page"] = False
+            set_current_step(1)
+            st.rerun()
+
+        # About button
+        if st.button("ℹ️ About", use_container_width=True, help="About this project"):
+            st.session_state["show_about_page"] = True
+            st.session_state["show_privacy_page"] = False
+            st.rerun()
 
         # Clear Session button
         if st.button("🗑️ Clear Session", use_container_width=True, help="Clear all data and start fresh"):

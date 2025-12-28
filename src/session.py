@@ -64,6 +64,10 @@ def initialize_session_state() -> None:
 
         # Error state
         "last_error": None,
+
+        # Page navigation
+        "show_about_page": False,
+        "show_privacy_page": False,
     }
 
     for key, default_value in defaults.items():
