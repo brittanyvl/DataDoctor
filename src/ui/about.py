@@ -50,7 +50,7 @@ def render_about_page():
 
     with col3:
         st.markdown(
-            '<a href="https://github.com/brittanyvl/DataDoctor" target="_blank" '
+            '<a href="https://datadoctor.streamlit.app/" target="_blank" '
             'style="color: #2F855A;">This Project</a>',
             unsafe_allow_html=True,
         )
