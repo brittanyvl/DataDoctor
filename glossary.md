@@ -59,6 +59,22 @@ Data cleaning ensures consistent formatting across your dataset without manually
 
 ---
 
+## Diagnostics
+**What it means:**
+The validation tests and rules that Data Doctor runs against your data to identify quality issues.
+
+**Why it matters:**
+Diagnostics help you discover problems in your data before they cause issues downstream. Think of it like a health checkup for your spreadsheet.
+
+**Examples:**
+- Checking for missing required values
+- Validating data types (text, numbers, dates)
+- Ensuring values fall within expected ranges
+- Detecting duplicate rows
+- Verifying pattern compliance (emails, phone numbers)
+
+---
+
 ## Date Format
 **What it means:**
 The specific way a date is written.
@@ -220,6 +236,23 @@ A date **and time**, optionally including timezone information.
 **Examples:**
 - `2025-01-07 14:32:10`
 - `2025-01-07T14:32:10Z`
+
+---
+
+## Treatments
+**What it means:**
+The data cleaning and remediation actions that Data Doctor applies to fix issues found during diagnostics.
+
+**Why it matters:**
+Treatments automatically correct common data problems, saving you from manually editing each cell. Think of it like medicine for your spreadsheet after the diagnosis.
+
+**Examples:**
+- Trimming extra whitespace from text
+- Standardizing date formats
+- Normalizing case (uppercase, lowercase)
+- Removing duplicate rows
+- Filling or flagging null values
+- Cleaning numeric formatting
 
 ---
 

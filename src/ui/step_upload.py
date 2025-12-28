@@ -10,6 +10,8 @@ import pandas as pd
 import yaml
 
 from src.constants import (
+    FAILURE_ACTION_LABELS,
+    FAILURE_LABEL_TO_ACTION,
     MAX_COLUMN_COUNT,
     MAX_ROW_COUNT,
     MAX_UPLOAD_SIZE_MB,
@@ -77,7 +79,7 @@ def render_step_upload():
         st.divider()
         _, next_clicked = navigation_buttons(
             show_back=False,
-            next_label="Select Data Tests",
+            next_label="Order Diagnostics",
             next_disabled=False,
         )
 
@@ -346,11 +348,12 @@ def _load_primary_data(file_content, filename, file_ext, sheet_name, file_hash):
         st.session_state["column_renames"] = {col: col for col in df.columns}
         st.session_state["columns_to_ignore"] = set()  # Reset ignored columns
 
-        success_box(f"Loaded {filename}" + (f" (sheet: {sheet_name})" if sheet_name else ""))
-
         # Check if there are pending contract import settings to apply
         if st.session_state.get("pending_import_settings"):
             _apply_contract_import_settings()
+
+        # Rerun to show the preview and configuration
+        st.rerun()
 
     finally:
         set_processing(False)
@@ -578,11 +581,40 @@ def _render_column_configuration():
         )
         st.session_state["skip_footer_rows"] = skip_footer
 
-    skip_total_rows = st.checkbox(
-        "Skip rows containing 'total'",
-        key="opt_skip_totals",
-        help="Remove rows where any cell contains 'total' or 'grand total' (case insensitive)"
-    )
+    # Checkboxes in two columns
+    check_col1, check_col2 = st.columns(2)
+
+    with check_col1:
+        skip_total_rows = st.checkbox(
+            "Skip rows containing 'total'",
+            key="opt_skip_totals",
+            help="Remove rows where any cell contains 'total' or 'grand total' (case insensitive)"
+        )
+
+    with check_col2:
+        check_duplicates = st.checkbox(
+            "Check for duplicate rows",
+            value=st.session_state.get("check_duplicates", False),
+            key="opt_check_duplicates",
+            help="Flag rows that are exact duplicates of other rows"
+        )
+        st.session_state["check_duplicates"] = check_duplicates
+
+    # Show failure action dropdown if duplicate check is enabled
+    if check_duplicates:
+        failure_labels = list(FAILURE_ACTION_LABELS.values())
+        current_action = st.session_state.get("duplicate_failure_action", "label_failure")
+        current_label = FAILURE_ACTION_LABELS.get(current_action, failure_labels[2])
+        current_idx = failure_labels.index(current_label) if current_label in failure_labels else 2
+
+        dup_failure_label = st.selectbox(
+            "On duplicate found",
+            options=failure_labels,
+            index=current_idx,
+            key="dup_failure_select",
+            help="What to do when duplicate rows are detected"
+        )
+        st.session_state["duplicate_failure_action"] = FAILURE_LABEL_TO_ACTION.get(dup_failure_label, "label_failure")
 
     st.divider()
 

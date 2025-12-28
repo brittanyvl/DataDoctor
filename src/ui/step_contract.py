@@ -92,7 +92,7 @@ def render_step_contract():
     # Configuration tabs
     tab1, tab2 = st.tabs([
         "Column Rules",
-        "Dataset Tests",
+        "Cross Field Validations",
     ])
 
     with tab1:
@@ -125,6 +125,8 @@ def render_step_contract():
 
 def _ensure_contract_exists(df, ignored_columns):
     """Ensure a contract exists, creating one if needed."""
+    from src.contract.schema import DatasetTest
+
     contract = st.session_state.get("contract")
 
     # Check if we have an uploaded contract from step 1
@@ -150,6 +152,18 @@ def _ensure_contract_exists(df, ignored_columns):
             import_settings=import_settings,
             ignored_columns=ignored_columns,
         )
+
+        # Add duplicate check if enabled in Step 1
+        if st.session_state.get("check_duplicates", False):
+            dup_action = st.session_state.get("duplicate_failure_action", "label_failure")
+            contract.dataset_tests.append(DatasetTest(
+                type="duplicate_rows",
+                severity="error",
+                on_fail=FailureHandling(
+                    action=dup_action,
+                    label_column_name="__data_doctor_errors__" if dup_action == "label_failure" else None,
+                ),
+            ))
 
         st.session_state["contract"] = contract
         st.session_state["contract_hash"] = compute_contract_hash({"id": contract.contract_id})
@@ -743,79 +757,7 @@ def _render_boolean_rules(col_config, col_name, existing_tests):
 
 
 def _render_dataset_tests(contract, df, columns_to_configure):
-    """Render dataset-level tests configuration."""
-    st.markdown("## Dataset Tests")
-    st.markdown("Add tests that validate the entire dataset.")
-
-    # Show existing dataset tests (excluding cross_field_rule which has its own section)
-    non_xf_tests = [t for t in contract.dataset_tests if t.type != "cross_field_rule"]
-    if non_xf_tests:
-        st.markdown("**Current dataset tests:**")
-        for i, test in enumerate(contract.dataset_tests):
-            if test.type == "cross_field_rule":
-                continue
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                failure_action = test.on_fail.action if test.on_fail else "label_failure"
-                st.markdown(f"- **{test.type}** → {FAILURE_ACTION_LABELS.get(failure_action, failure_action)}")
-            with col2:
-                if st.button("Remove", key=f"rm_ds_test_{i}"):
-                    contract.dataset_tests.pop(i)
-                    st.rerun()
-        st.divider()
-
-    # Duplicate row check - checkbox and dropdown in one row
-    dup_cols = st.columns([1, 2])
-
-    with dup_cols[0]:
-        dup_check = st.checkbox(
-            "Check for duplicate rows",
-            key="ds_dup_check",
-            help="Flag rows that are exact duplicates of other rows",
-        )
-
-    with dup_cols[1]:
-        if dup_check:
-            # Get current failure action if exists
-            existing_dup = next((t for t in contract.dataset_tests if t.type == "duplicate_rows"), None)
-            current_action = existing_dup.on_fail.action if existing_dup and existing_dup.on_fail else "label_failure"
-            current_label = FAILURE_ACTION_LABELS.get(current_action, list(FAILURE_ACTION_LABELS.values())[2])
-            failure_labels = list(FAILURE_ACTION_LABELS.values())
-            current_idx = failure_labels.index(current_label) if current_label in failure_labels else 2
-
-            dup_failure_label = st.selectbox(
-                "On Failure",
-                options=failure_labels,
-                index=current_idx,
-                key="ds_dup_failure",
-                label_visibility="collapsed",
-            )
-            dup_failure_action = FAILURE_LABEL_TO_ACTION.get(dup_failure_label, "label_failure")
-
-    if dup_check:
-        existing_dup = next((t for t in contract.dataset_tests if t.type == "duplicate_rows"), None)
-        if existing_dup:
-            existing_dup.on_fail = FailureHandling(
-                action=dup_failure_action,
-                label_column_name="__data_doctor_errors__" if dup_failure_action == "label_failure" else None,
-            )
-        else:
-            from src.contract.schema import DatasetTest
-            contract.dataset_tests.append(DatasetTest(
-                type="duplicate_rows",
-                severity="error",
-                on_fail=FailureHandling(
-                    action=dup_failure_action,
-                    label_column_name="__data_doctor_errors__" if dup_failure_action == "label_failure" else None,
-                ),
-            ))
-    else:
-        contract.dataset_tests = [t for t in contract.dataset_tests if t.type != "duplicate_rows"]
-
-    st.caption("For column uniqueness rules (like primary keys), use the 'Must be unique' option in Column Rules.")
-
-    st.divider()
-
+    """Render cross-field validation rules."""
     # Cross-field rules section
     _render_cross_field_rules(contract, df, columns_to_configure)
 

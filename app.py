@@ -94,11 +94,14 @@ def _render_sidebar():
 
     with st.sidebar:
         # Branding header (green title, coal tagline) - compact with inline styles
+        # Using div wrapper to ensure styles apply
         st.markdown(
-            f'<p style="color: #2F855A !important; font-size: 1.25rem; font-weight: 700; '
-            f'margin: 0; padding: 0; line-height: 1.2;">{APP_NAME}</p>'
-            f'<p style="color: #2D3748 !important; font-size: 0.8rem; font-style: italic; '
-            f'margin: 0.15rem 0 0.75rem 0; padding: 0;">{APP_TAGLINE}</p>',
+            f'<div style="margin-bottom: 0.75rem;">'
+            f'<span style="color: #2F855A; font-size: 1.25rem; font-weight: 700; '
+            f'display: block; line-height: 1.2;">{APP_NAME}</span>'
+            f'<span style="color: #2D3748; font-size: 0.8rem; font-style: italic; '
+            f'display: block; margin-top: 0.15rem;">{APP_TAGLINE}</span>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
@@ -161,7 +164,7 @@ def _render_sidebar():
 
         # Feature requests link
         st.markdown(
-            '<a href="https://github.com/anthropics/claude-code/issues" target="_blank" '
+            '<a href="https://github.com/brittanyvl/DataDoctor/issues" target="_blank" '
             'style="color: #2F855A;">Request a Feature</a>',
             unsafe_allow_html=True,
         )
@@ -199,24 +202,24 @@ def _render_status_summary():
     else:
         st.markdown("*No file loaded*")
 
-    # Rules status
+    # Diagnostics status (rules/contract)
     contract = st.session_state.get("contract")
     if contract:
         source = st.session_state.get("contract_source", "unknown")
-        st.markdown(f"**Rules:** {source}")
+        st.markdown(f"**Diagnostics:** {source}")
     else:
-        st.markdown("*No rules defined*")
+        st.markdown("*No Diagnostics Ordered*")
 
-    # Diagnostics status
+    # Treatment status (validation/cleaning results)
     validation = st.session_state.get("validation_results")
     if validation:
         if validation.is_valid:
-            st.markdown("**Diagnostics:** All checks passed")
+            st.markdown("**Findings:** All checks passed")
         else:
             errors = validation.summary.total_errors
-            st.markdown(f"**Diagnostics:** {errors} issues found")
+            st.markdown(f"**Findings:** {errors} issues found")
     else:
-        st.markdown("*Not checked*")
+        st.markdown("*No Treatments Ordered*")
 
     # Data cleansing status
     if st.session_state.get("remediation_approved"):
