@@ -64,6 +64,13 @@ def render_step_upload():
         )
         return
 
+    # Check upload mode - if using contract flow, stay in that view
+    upload_mode = st.session_state.get("upload_mode")
+    if upload_mode == "contract":
+        # Stay in contract upload flow until auto-navigation happens
+        _render_contract_upload()
+        return
+
     # Check if we have a file loaded already
     df = st.session_state.get("dataframe")
 
@@ -163,19 +170,26 @@ def _render_fresh_upload():
 
 
 def _render_contract_upload():
-    """Render the contract-first upload flow."""
+    """Render the contract-first upload flow - wait for BOTH files before processing."""
     # Back button
     if st.button("← Back to options"):
         st.session_state["upload_mode"] = None
-        if "uploaded_contract" in st.session_state:
-            del st.session_state["uploaded_contract"]
+        # Clear any pending files
+        for key in ["pending_contract_file", "pending_data_file", "pending_data_filename",
+                    "uploaded_contract", "contract_auto_applied"]:
+            if key in st.session_state:
+                del st.session_state[key]
         st.rerun()
 
     uploader_version = st.session_state.get("uploader_version", 0)
 
-    # Check if contract is already loaded
-    if st.session_state.get("uploaded_contract") is None:
-        st.markdown("**Step 1: Upload your contract**")
+    st.markdown("Upload both files to run diagnostics with your saved settings.")
+
+    # Show both uploaders side by side
+    upload_cols = st.columns(2)
+
+    with upload_cols[0]:
+        st.markdown("**Contract File (YAML)**")
         contract_file = st.file_uploader(
             "Choose contract YAML file",
             type=["yaml", "yml"],
@@ -183,28 +197,209 @@ def _render_contract_upload():
             key=f"contract_file_uploader_v{uploader_version}",
         )
 
-        if contract_file is not None:
-            _handle_contract_upload(contract_file)
-    else:
-        success_box("Contract loaded successfully!")
-
-        st.markdown("**Step 2: Upload data file to validate**")
-
-        # Check if we're in sheet selection mode
-        pending_file = st.session_state.get("pending_file_content")
-        if pending_file is not None:
-            _render_sheet_selection()
-            return
-
-        primary_file = st.file_uploader(
+    with upload_cols[1]:
+        st.markdown("**Data File**")
+        data_file = st.file_uploader(
             "Choose your data file",
             type=[ext.lstrip('.') for ext in SUPPORTED_EXTENSIONS],
-            help="Upload a CSV or Excel file to validate against the contract",
+            help="Upload a CSV or Excel file to diagnose and treat",
             key=f"contract_data_uploader_v{uploader_version}",
         )
 
-        if primary_file is not None:
-            _handle_primary_file(primary_file)
+    # Only process when BOTH files are present
+    if contract_file is not None and data_file is not None:
+        # Process both files and navigate to Step 4
+        _process_contract_and_data(contract_file, data_file)
+
+
+def _process_contract_and_data(contract_file, data_file):
+    """Process both contract and data file together, then navigate to Step 4."""
+    with st.spinner("Loading contract and data, applying settings..."):
+        # 1. Parse the contract
+        try:
+            content = contract_file.read()
+            contract_file.seek(0)
+            contract_data = yaml.safe_load(content.decode("utf-8"))
+            contract = dict_to_contract(contract_data)
+        except yaml.YAMLError as e:
+            error_box(f"Invalid YAML format: {str(e)}")
+            return
+        except Exception as e:
+            error_box(f"Error loading contract: {str(e)}")
+            return
+
+        # 2. Read and validate the data file
+        data_content = data_file.read()
+        data_file.seek(0)
+        file_hash = compute_file_hash(data_content)
+
+        # Validate upload
+        validation_result = validate_upload(
+            data_file.name,
+            len(data_content),
+            data_file.type,
+        )
+
+        if not validation_result.is_valid:
+            error_box(validation_result.error_message)
+            return
+
+        file_ext = validation_result.file_extension
+
+        # Handle Excel sheet selection if needed
+        if file_ext in {".xlsx", ".xls", ".xlsb"}:
+            sheet_result = get_excel_sheet_names(data_content, file_ext)
+            if not sheet_result.success:
+                error_box(sheet_result.error_message)
+                return
+
+            if len(sheet_result.sheet_names) > 1:
+                # For now, use the first sheet. Could add sheet selection later.
+                sheet_name = sheet_result.sheet_names[0]
+                info_box(f"Using first sheet: {sheet_name}")
+            else:
+                sheet_name = sheet_result.sheet_names[0]
+        else:
+            sheet_name = None
+
+        # Get import settings from contract
+        import_settings = contract.dataset.import_settings
+        skip_rows = import_settings.skip_rows
+        skip_footer_rows = import_settings.skip_footer_rows
+
+        # Read the file
+        read_result = read_file(
+            data_content,
+            data_file.name,
+            file_ext,
+            sheet_name=sheet_name,
+            skip_rows=skip_rows,
+            skip_footer_rows=skip_footer_rows,
+        )
+
+        if not read_result.success:
+            error_box(read_result.error_message)
+            return
+
+        df = read_result.dataframe
+
+        # Validate dataframe
+        is_valid, error_msg = validate_dataframe(df)
+        if not is_valid:
+            error_box(error_msg)
+            return
+
+        is_valid, error_msg = validate_dataframe_limits(len(df), len(df.columns))
+        if not is_valid:
+            error_box(error_msg)
+            return
+
+        # 3. Apply contract import settings (column renames, etc.)
+        # Apply quick actions to column names
+        qa = import_settings.quick_actions
+        if any([qa.to_lowercase, qa.to_uppercase, qa.to_titlecase,
+                qa.trim_whitespace, qa.remove_punctuation, qa.replace_spaces_with_underscores]):
+            import re
+            import string
+            new_columns = []
+            for col in df.columns:
+                new_name = str(col)
+                if qa.trim_whitespace:
+                    new_name = re.sub(r'^\s+|\s+$', '', new_name)
+                if qa.remove_punctuation:
+                    new_name = "".join(c for c in new_name if c not in string.punctuation)
+                if qa.replace_spaces_with_underscores:
+                    new_name = re.sub(r'\s+', '_', new_name)
+                if qa.to_lowercase:
+                    new_name = new_name.lower()
+                elif qa.to_uppercase:
+                    new_name = new_name.upper()
+                elif qa.to_titlecase:
+                    new_name = new_name.title()
+                new_columns.append(new_name)
+            df.columns = new_columns
+
+        # Apply column renames from contract
+        if import_settings.column_renames:
+            df = df.rename(columns=import_settings.column_renames)
+
+        # 4. Store everything in session state
+        st.session_state["uploaded_file_name"] = data_file.name
+        st.session_state["file_hash"] = file_hash
+        st.session_state["file_content"] = data_content
+        st.session_state["file_ext"] = file_ext
+        st.session_state["dataframe"] = df
+        st.session_state["sheet_name"] = sheet_name
+        st.session_state["applied_skip_rows"] = skip_rows
+        st.session_state["applied_skip_footer_rows"] = skip_footer_rows
+        st.session_state["column_renames"] = {col: col for col in df.columns}
+        st.session_state["columns_to_ignore"] = set(import_settings.columns_to_ignore or [])
+        st.session_state["ignored_columns"] = list(import_settings.columns_to_ignore or [])
+
+        # Store the contract
+        st.session_state["uploaded_contract"] = contract
+        st.session_state["contract"] = contract
+        st.session_state["contract_source"] = "uploaded"
+        st.session_state["contract_auto_applied"] = True
+
+        # 5. Navigate directly to Step 4
+        set_current_step(4)
+        st.rerun()
+
+
+def _render_contract_summary(contract):
+    """Render a human-readable summary of the contract."""
+    # Overview metrics
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Columns", len(contract.columns))
+
+    with col2:
+        total_tests = sum(len(c.tests) for c in contract.columns) + len(contract.dataset_tests)
+        st.metric("Diagnostic Rules", total_tests)
+
+    with col3:
+        total_remediation = sum(len(c.remediation) for c in contract.columns)
+        st.metric("Treatment Rules", total_remediation)
+
+    # Column details
+    st.markdown("**Column Diagnostics:**")
+
+    for col_config in contract.columns:
+        # Build column summary line
+        col_info = f"• **{col_config.name}** ({col_config.data_type})"
+
+        details = []
+        if col_config.required:
+            details.append("required")
+
+        # List tests
+        test_names = [t.type.replace("_", " ") for t in col_config.tests]
+        if test_names:
+            details.append(f"tests: {', '.join(test_names)}")
+
+        # List remediation
+        rem_names = [r.type.replace("_", " ") for r in col_config.remediation]
+        if rem_names:
+            details.append(f"treatments: {', '.join(rem_names)}")
+
+        if details:
+            col_info += f" — {'; '.join(details)}"
+
+        st.markdown(col_info)
+
+    # Dataset-level tests
+    if contract.dataset_tests:
+        st.markdown("**Dataset-Level Diagnostics:**")
+        for test in contract.dataset_tests:
+            st.markdown(f"• {test.type.replace('_', ' ')} ({test.severity})")
+
+    # Foreign key checks
+    if contract.foreign_key_checks:
+        st.markdown("**Foreign Key Checks:**")
+        for fk in contract.foreign_key_checks:
+            st.markdown(f"• {fk.name}: {fk.dataset_column} → {fk.fk_column}")
 
 
 def _handle_primary_file(uploaded_file):
@@ -502,6 +697,7 @@ def _clear_session():
         "remediation_approved", "column_config_version", "applied_quick_actions",
         "apply_changes_message", "pending_file_content", "pending_file_name",
         "pending_file_ext", "pending_file_hash", "available_sheets",
+        "contract_auto_applied",
     ]
 
     for key in keys_to_clear:
