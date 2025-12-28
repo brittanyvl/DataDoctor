@@ -33,7 +33,7 @@ FONT_MONO = "JetBrains Mono, SFMono-Regular, Consolas, 'Liberation Mono', monosp
 # BRANDING
 # =============================================================================
 
-APP_TAGLINE = "Spreadsheet diagnostics you can trust."
+APP_TAGLINE = "Diagnose and treat your spreadsheet ailments."
 
 # =============================================================================
 # CSS INJECTION

@@ -174,32 +174,22 @@ def _display_validation_summary(validation_result):
                 f"Diagnostics completed - {summary.total_errors} issues found."
             )
 
-    # Metrics
+    # Metrics - simple counts without misleading delta arrows
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.metric("Tests Run", summary.total_tests_run)
 
     with col2:
-        st.metric(
-            "Tests Passed",
-            summary.total_tests_passed,
-            delta=f"{summary.total_tests_passed}/{summary.total_tests_run}",
-        )
+        pass_rate = f"{summary.total_tests_passed}/{summary.total_tests_run}"
+        st.metric("Tests Passed", pass_rate)
 
     with col3:
-        st.metric(
-            "Rows with Errors",
-            f"{summary.rows_with_errors:,}",
-            delta=f"{summary.error_rate_percent}%",
-            delta_color="inverse",
-        )
+        error_display = f"{summary.rows_with_errors:,} ({summary.error_rate_percent}%)"
+        st.metric("Rows with Errors", error_display)
 
     with col4:
-        st.metric(
-            "Clean Rows",
-            f"{summary.clean_rows:,}",
-        )
+        st.metric("Clean Rows", f"{summary.clean_rows:,}")
 
     # Blocking errors
     if validation_result.blocking_errors:

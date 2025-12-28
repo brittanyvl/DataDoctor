@@ -220,10 +220,14 @@ def _looks_like_boolean(series: pd.Series) -> bool:
 
 
 def _looks_like_integer(series: pd.Series) -> bool:
-    """Check if series looks like integer values."""
+    """Check if series looks like integer values, including with punctuation like %, $, etc."""
     try:
-        # Remove commas and try to convert
+        # Remove common punctuation that might surround numbers: $, %, commas
         cleaned = series.astype(str).str.replace(",", "", regex=False)
+        cleaned = cleaned.str.replace("$", "", regex=False)
+        cleaned = cleaned.str.replace("%", "", regex=False)
+        cleaned = cleaned.str.replace("€", "", regex=False)
+        cleaned = cleaned.str.replace("£", "", regex=False)
         cleaned = cleaned.str.strip()
         # Check if all values are digits (possibly with leading minus)
         pattern = r"^-?\d+$"
@@ -481,3 +485,95 @@ def get_column_config(contract: Contract, column_name: str) -> Optional[ColumnCo
         if col.name == column_name:
             return col
     return None
+
+
+def detect_percentage_column(series: pd.Series) -> dict:
+    """
+    Detect if a column contains percentage values.
+
+    Args:
+        series: The pandas Series to analyze
+
+    Returns:
+        dict with keys:
+            - is_percentage: bool
+            - has_decimal: bool (True if values have decimals, suggesting float)
+            - suggested_type: 'integer' or 'float'
+    """
+    result = {"is_percentage": False, "has_decimal": False, "suggested_type": "text"}
+
+    non_null = series.dropna()
+    if len(non_null) == 0:
+        return result
+
+    sample = non_null.head(20).astype(str)
+
+    # Check if values contain % sign
+    has_percent = sample.str.contains("%").any()
+    if not has_percent:
+        return result
+
+    # Check if most values have % sign (at least 50%)
+    percent_count = sample.str.contains("%").sum()
+    if percent_count < len(sample) * 0.5:
+        return result
+
+    result["is_percentage"] = True
+
+    # Check if any values have decimals
+    # Remove % and check for decimal points
+    cleaned = sample.str.replace("%", "", regex=False).str.strip()
+    has_decimal = cleaned.str.contains(r"\.").any()
+    result["has_decimal"] = has_decimal
+    result["suggested_type"] = "float" if has_decimal else "integer"
+
+    return result
+
+
+def detect_boolean_format(series: pd.Series) -> str:
+    """
+    Detect which boolean format best matches the data.
+
+    Args:
+        series: The pandas Series to analyze
+
+    Returns:
+        String matching one of the boolean format options:
+            - "true/false (text)"
+            - "t/f (text)"
+            - "1/0 (numeric)"
+            - "yes/no (text)"
+            - "Y/N (text)"
+            - "Any standard format"
+    """
+    non_null = series.dropna()
+    if len(non_null) == 0:
+        return "Any standard format"
+
+    sample = non_null.head(20).astype(str).str.strip()
+    unique_values = set(sample.str.lower().unique())
+
+    # Check each format in order of specificity
+    # true/false
+    if unique_values.issubset({"true", "false"}):
+        return "true/false (text)"
+
+    # t/f
+    if unique_values.issubset({"t", "f"}):
+        return "t/f (text)"
+
+    # 1/0
+    if unique_values.issubset({"1", "0"}):
+        return "1/0 (numeric)"
+
+    # yes/no
+    if unique_values.issubset({"yes", "no"}):
+        return "yes/no (text)"
+
+    # Y/N (case sensitive check)
+    unique_original = set(sample.unique())
+    if unique_original.issubset({"Y", "N", "y", "n"}):
+        return "Y/N (text)"
+
+    # Default to any standard format
+    return "Any standard format"

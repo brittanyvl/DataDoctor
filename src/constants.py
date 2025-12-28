@@ -8,7 +8,7 @@ configuration constants used throughout the Data Doctor application.
 # Application metadata
 APP_NAME = "Data Doctor"
 APP_VERSION = "0.1.0"
-APP_TAGLINE = "Spreadsheet diagnostics you can trust."
+APP_TAGLINE = "Diagnose and treat your spreadsheet ailments."
 CONTRACT_VERSION = "1.0"
 
 # File size and content limits (Section 5 of acceptance criteria)
@@ -155,11 +155,11 @@ COMPARISON_OPERATORS = ["<", "<=", ">", ">=", "==", "!="]
 
 # UI step definitions (5-step workflow)
 UI_STEPS = [
-    {"number": 1, "name": "Upload", "description": "Upload dataset and configure columns"},
+    {"number": 1, "name": "Data Check-In", "description": "Upload dataset and configure columns"},
     {"number": 2, "name": "Order Diagnostics", "description": "Define data quality rules"},
-    {"number": 3, "name": "Order Treatment", "description": "Configure data cleaning options"},
+    {"number": 3, "name": "Order Treatments", "description": "Configure data cleaning options"},
     {"number": 4, "name": "Review Findings", "description": "Review diagnostic findings"},
-    {"number": 5, "name": "Download", "description": "Download results"},
+    {"number": 5, "name": "Download Data & Reports", "description": "Download results"},
 ]
 
 # Characters removed by data cleaning options

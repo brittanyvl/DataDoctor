@@ -19,6 +19,8 @@ from src.contract.builder import (
     build_contract_from_dataframe,
     build_import_settings_from_session,
     get_column_config,
+    detect_percentage_column,
+    detect_boolean_format,
 )
 from src.contract.validator import validate_contract, format_validation_errors
 from src.contract.schema import (
@@ -51,11 +53,9 @@ from src.ui.components import (
 
 def render_step_contract():
     """Render the contract configuration step."""
-    step_header(
-        2,
-        "Create Rules",
-        "Define validation tests and data quality rules for each column.",
-    )
+    # Custom header without divider
+    st.markdown("### Step 2: Order Diagnostics")
+    st.markdown("*Define validation tests and data quality rules for each column.*")
 
     # Check if we have a dataframe
     df = st.session_state.get("dataframe")
@@ -82,12 +82,22 @@ def render_step_contract():
     # Initialize or get contract
     contract = _ensure_contract_exists(df, ignored_columns)
 
-    # Summary
+    # Compact summary with bold labels
     col1, col2 = st.columns(2)
     with col1:
-        st.metric("Columns to Validate", len(columns_to_configure))
+        st.markdown(f"**Columns to Diagnose:** {len(columns_to_configure)}")
     with col2:
-        st.metric("Ignored", len(ignored_columns))
+        st.markdown(f"**Ignored Columns:** {len(ignored_columns)}")
+
+    # Inject CSS for larger/bolder tabs
+    st.markdown("""
+    <style>
+        .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
     # Configuration tabs
     tab1, tab2 = st.tabs([
@@ -174,8 +184,6 @@ def _ensure_contract_exists(df, ignored_columns):
 
 def _render_column_rules(contract, df, columns_to_configure):
     """Render column-by-column rule configuration with per-column sections."""
-    st.markdown("Configure each column below.")
-
     # Each column displayed directly on page (no expanders)
     for i, col_name in enumerate(columns_to_configure):
         col_config = get_column_config(contract, col_name)
@@ -186,11 +194,11 @@ def _render_column_rules(contract, df, columns_to_configure):
         if i > 0:
             st.divider()
 
-        # Column header
+        # Column header with "Column: " prefix
         tests_count = len(col_config.tests)
         required_badge = " *(Required)*" if col_config.required else ""
         rules_badge = f" — {tests_count} rule(s)" if tests_count > 0 else ""
-        st.markdown(f"## {col_name}{required_badge}{rules_badge}")
+        st.markdown(f"## Column: {col_name}{required_badge}{rules_badge}")
 
         _render_single_column_config(contract, df, col_name, col_config)
 
@@ -227,11 +235,16 @@ def _render_single_column_config(contract, df, col_name, col_config):
     with stat_cols[2]:
         st.markdown(f"**Unique:** {col_data.nunique():,}")
 
-    # Column Settings - adjusted column widths (1:2:3 ratio)
-    st.markdown(f"##### {col_name} Column Settings")
+    # Column settings row - no heading, adjusted column widths (1:2:3 ratio)
     settings_cols = st.columns([1, 2, 3])
 
     with settings_cols[0]:
+        # Style Required checkbox with bold dark green text
+        st.markdown(
+            '<style>div[data-testid="stCheckbox"]:has(input[aria-label="Required"]) label span '
+            '{font-weight: 700; color: #2F855A;}</style>',
+            unsafe_allow_html=True
+        )
         required = st.checkbox(
             "Required",
             value=col_config.required,
@@ -279,12 +292,11 @@ def _render_single_column_config(contract, df, col_name, col_config):
             label_column_name="__data_doctor_errors__" if failure_action == "label_failure" else None,
         )
 
-    # Validation Rules - no expander, just section
-    st.markdown(f"##### {col_name} Validation Rules")
-    _render_validation_rules(contract, col_config, col_name, data_type)
+    # Validation Rules - no heading, just options
+    _render_validation_rules(contract, col_config, col_name, data_type, df[col_name])
 
 
-def _render_validation_rules(contract, col_config, col_name, data_type):
+def _render_validation_rules(contract, col_config, col_name, data_type, col_series):
     """Render validation rule checkboxes based on data type."""
     # Track which tests are already enabled
     existing_tests = {t.type: t for t in col_config.tests}
@@ -304,14 +316,18 @@ def _render_validation_rules(contract, col_config, col_name, data_type):
         _toggle_test(col_config, "uniqueness", unique_check, existing_tests)
 
     with rule_cols[1]:
-        # Approved Values (enum)
-        has_enum = "enum" in existing_tests
-        enum_check = st.checkbox(
-            "Approved values only",
-            value=has_enum,
-            key=f"enum_{col_name}",
-            help="Values must match a predefined list",
-        )
+        # Approved Values (enum) - hide for boolean types since format validation handles it
+        if data_type != "boolean":
+            has_enum = "enum" in existing_tests
+            enum_check = st.checkbox(
+                "Approved values only",
+                value=has_enum,
+                key=f"enum_{col_name}",
+                help="Values must match a predefined list",
+            )
+        else:
+            enum_check = False
+            has_enum = "enum" in existing_tests
 
     # If approved values is checked, show single dropdown
     if enum_check:
@@ -322,7 +338,7 @@ def _render_validation_rules(contract, col_config, col_name, data_type):
 
     # Data type specific rules
     if data_type in ["integer", "float"]:
-        _render_numeric_rules(col_config, col_name, existing_tests)
+        _render_numeric_rules(col_config, col_name, existing_tests, col_series)
     elif data_type == "text":
         _render_text_rules(col_config, col_name, existing_tests)
     elif data_type == "date":
@@ -330,7 +346,7 @@ def _render_validation_rules(contract, col_config, col_name, data_type):
     elif data_type == "timestamp":
         _render_timestamp_rules(col_config, col_name, existing_tests)
     elif data_type == "boolean":
-        _render_boolean_rules(col_config, col_name, existing_tests)
+        _render_boolean_rules(col_config, col_name, existing_tests, col_series)
 
 
 def _toggle_test(col_config, test_type, enabled, existing_tests):
@@ -396,24 +412,38 @@ def _render_approved_values_dropdown(col_config, col_name, existing_tests):
         col_config.tests.append(TestConfig(type="enum", severity="error", params=params))
 
 
-def _render_numeric_rules(col_config, col_name, existing_tests):
+def _render_numeric_rules(col_config, col_name, existing_tests, col_series):
     """Render rules specific to numeric types."""
     st.markdown("**Numeric Options:**")
 
-    num_cols = st.columns(2)
+    # Detect if this is a percentage column
+    pct_info = detect_percentage_column(col_series)
+    is_percentage = pct_info["is_percentage"]
+
+    # Check if we've already applied percentage defaults for this column
+    pct_defaults_key = f"pct_defaults_applied_{col_name}"
+    pct_defaults_applied = st.session_state.get(pct_defaults_key, False)
+
+    # Determine default values
+    has_range = "range" in existing_tests
+    has_mono = "monotonic" in existing_tests
+
+    # For percentage columns that haven't had defaults applied yet, set defaults
+    default_range = has_range or (is_percentage and not pct_defaults_applied)
+    default_ignore_punct = st.session_state.get(f"ignore_punct_{col_name}", False) or (is_percentage and not pct_defaults_applied)
+
+    num_cols = st.columns(3)
 
     with num_cols[0]:
         # Range check
-        has_range = "range" in existing_tests
         range_check = st.checkbox(
             "Set min/max range",
-            value=has_range,
+            value=default_range,
             key=f"range_{col_name}",
         )
 
     with num_cols[1]:
         # Monotonic (sequential)
-        has_mono = "monotonic" in existing_tests
         mono_check = st.checkbox(
             "Must be sequential",
             value=has_mono,
@@ -421,18 +451,45 @@ def _render_numeric_rules(col_config, col_name, existing_tests):
             help="Values must always increase or decrease (e.g., ID numbers, dates)",
         )
 
+    with num_cols[2]:
+        # Ignore punctuation in tests
+        ignore_punct_key = f"ignore_punct_{col_name}"
+        ignore_punct = st.checkbox(
+            "Ignore punctuation",
+            value=default_ignore_punct,
+            key=ignore_punct_key,
+            help="Ignore $, %, commas, and other punctuation when running tests",
+        )
+        # Store in session state for use during validation
+        st.session_state[f"numeric_ignore_punct_{col_name}"] = ignore_punct
+
+    # Mark percentage defaults as applied
+    if is_percentage and not pct_defaults_applied:
+        st.session_state[pct_defaults_key] = True
+
     if range_check:
+        # For percentage columns, default to 0-100 range
+        default_min = 0.0
+        default_max = 100.0
+        if "range" in existing_tests:
+            default_min = existing_tests["range"].params.get("min", 0.0)
+            default_max = existing_tests["range"].params.get("max", 100.0)
+        elif is_percentage:
+            # Auto-set 0-100 for percentage columns
+            default_min = 0.0
+            default_max = 100.0
+
         range_cols = st.columns(2)
         with range_cols[0]:
             min_val = st.number_input(
                 "Minimum value",
-                value=existing_tests.get("range", TestConfig(type="range", params={})).params.get("min", 0.0),
+                value=default_min,
                 key=f"range_min_{col_name}",
             )
         with range_cols[1]:
             max_val = st.number_input(
                 "Maximum value",
-                value=existing_tests.get("range", TestConfig(type="range", params={})).params.get("max", 100.0),
+                value=default_max,
                 key=f"range_max_{col_name}",
             )
 
@@ -733,21 +790,35 @@ def _render_timestamp_rules(col_config, col_name, existing_tests):
         col_config.tests = [t for t in col_config.tests if t.type != "date_window"]
 
 
-def _render_boolean_rules(col_config, col_name, existing_tests):
+def _render_boolean_rules(col_config, col_name, existing_tests, col_series):
     """Render rules specific to boolean types."""
     st.markdown("**Boolean Options:**")
 
     st.caption("Select which values should be recognized as true/false:")
 
+    # Define format options
+    format_options = [
+        "true/false (text)",
+        "t/f (text)",
+        "1/0 (numeric)",
+        "yes/no (text)",
+        "Y/N (text)",
+        "Any standard format",
+    ]
+
+    # Detect the best matching format from sample data
+    detected_format = detect_boolean_format(col_series)
+
+    # Find the index of the detected format
+    try:
+        default_idx = format_options.index(detected_format)
+    except ValueError:
+        default_idx = len(format_options) - 1  # "Any standard format"
+
     bool_format = st.selectbox(
         "Boolean format",
-        options=[
-            "true/false (text)",
-            "1/0 (numeric)",
-            "yes/no",
-            "Y/N",
-            "Any standard format",
-        ],
+        options=format_options,
+        index=default_idx,
         key=f"bool_fmt_{col_name}",
         help="Choose how boolean values are represented in your data",
     )

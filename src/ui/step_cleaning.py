@@ -29,10 +29,12 @@ from src.ui.components import (
 
 def render_step_cleaning():
     """Render the data cleaning configuration step."""
-    step_header(
-        3,
-        "Configure Data Cleaning",
-        "Set up formatting and remediation rules to clean your data.",
+    # Custom header without divider
+    st.markdown("### Step 3: Order Data Treatments")
+    st.info(
+        "After testing you can optionally treat data hygiene issues. If you selected "
+        "**Label Failure: Mark and Continue** as your failure action, we will provide "
+        "the labeled original dataset along with the cleaned dataset for download in your final reports."
     )
 
     # Check prerequisites
@@ -64,44 +66,30 @@ def render_step_cleaning():
             st.rerun()
         return
 
-    # Info about data cleaning
-    info_box(
-        "Data cleaning options are applied during processing. "
-        "Configure how you want each column's data to be formatted and standardized."
-    )
-
-    # Summary metrics
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Columns", len(columns_to_configure))
-    with col2:
-        # Count columns with cleaning configured
-        cleaning_count = sum(
-            1 for col in columns_to_configure
-            if get_column_config(contract, col) and len(get_column_config(contract, col).remediation) > 0
-        )
-        st.metric("With Cleaning", cleaning_count)
-    with col3:
-        st.metric("No Cleaning", len(columns_to_configure) - cleaning_count)
-
-    st.divider()
-
     # Global cleaning options
     st.markdown("## Global Cleaning Options")
     st.markdown("Apply these options to all columns at once.")
 
-    # Checkbox options in a row
+    # Checkbox options in two rows
     st.markdown("**Apply to All Columns:**")
-    check_cols = st.columns(4)
 
-    with check_cols[0]:
+    # Row 1: Trim whitespace, Remove special chars, Standardize nulls
+    row1_cols = st.columns(3)
+    with row1_cols[0]:
         apply_trim = st.checkbox("Trim whitespace", key="global_trim", help="Remove leading/trailing spaces from all columns")
-    with check_cols[1]:
+    with row1_cols[1]:
         apply_special = st.checkbox("Remove special chars", key="global_special", help="Remove control characters and non-printable characters")
-    with check_cols[2]:
-        apply_punct = st.checkbox("Remove punctuation", key="global_punct", help="Remove all punctuation marks")
-    with check_cols[3]:
+    with row1_cols[2]:
         apply_nulls = st.checkbox("Standardize nulls", key="global_nulls", help="Convert NA, N/A, None, etc. to actual null")
+
+    # Row 2: Remove punctuation (text), Remove punctuation (numbers), Drop ignored columns
+    row2_cols = st.columns(3)
+    with row2_cols[0]:
+        apply_punct = st.checkbox("Remove punctuation (text)", key="global_punct", help="Remove all punctuation marks from text columns only. Does not apply to numeric columns (integer/float) to preserve decimal points.")
+    with row2_cols[1]:
+        apply_numeric_clean = st.checkbox("Remove punctuation (numbers)", key="global_numeric", help="Remove currency symbols ($, EUR), thousand separators (,), and other non-numeric characters from all numeric columns")
+    with row2_cols[2]:
+        drop_ignored = st.checkbox("Drop ignored columns", key="global_drop_ignored", help="Remove columns marked as 'ignored' from the final output")
 
     # Dropdown options in a row
     drop_cols = st.columns(2)
@@ -160,12 +148,27 @@ def render_step_cleaning():
             changes_made.append("remove special chars")
 
         if apply_punct:
-            _apply_cleaning_to_all(contract, columns_to_configure, "remove_punctuation")
-            changes_made.append("remove punctuation")
+            # Apply punctuation removal only to non-numeric columns
+            non_numeric_cols = [col for col in columns_to_configure
+                               if get_column_config(contract, col) and get_column_config(contract, col).data_type not in ["integer", "float"]]
+            _apply_cleaning_to_all(contract, non_numeric_cols, "remove_punctuation")
+            changes_made.append("remove punctuation (non-numeric)")
 
         if apply_nulls:
             _apply_cleaning_to_all(contract, columns_to_configure, "standardize_nulls")
             changes_made.append("standardize nulls")
+
+        if apply_numeric_clean:
+            # Apply numeric cleanup only to numeric columns
+            numeric_cols = [col for col in columns_to_configure
+                          if get_column_config(contract, col) and get_column_config(contract, col).data_type in ["integer", "float"]]
+            _apply_cleaning_to_all(contract, numeric_cols, "numeric_cleanup")
+            changes_made.append(f"clean numeric ({len(numeric_cols)} columns)")
+
+        if drop_ignored:
+            # Store the setting to drop ignored columns in session state
+            st.session_state["drop_ignored_columns"] = True
+            changes_made.append(f"drop ignored ({len(ignored_columns)} columns)")
 
         if global_case != "No change":
             case_map = {"lowercase": "lower", "UPPERCASE": "upper", "Title Case": "title"}
@@ -189,13 +192,23 @@ def render_step_cleaning():
         st.success(st.session_state["global_clean_message"])
         del st.session_state["global_clean_message"]
 
-    # Skip button - go directly to validation
-    st.markdown("---")
+    # Skip button - go directly to validation (styled dark green)
     skip_cols = st.columns([2, 1])
     with skip_cols[1]:
-        if st.button("Skip Per-Column & Run Diagnostics", use_container_width=True):
+        if st.button("Run Diagnostics & Treatments →", use_container_width=True, key="skip_to_diag", type="primary"):
             set_current_step(4)
             st.rerun()
+
+    # Inject CSS to make the skip button dark green (override primary color)
+    st.markdown(
+        """<style>
+        [data-testid="stButton"] button[kind="primary"] {
+            background-color: #2F855A !important;
+            border-color: #2F855A !important;
+        }
+        </style>""",
+        unsafe_allow_html=True,
+    )
 
     st.divider()
 
@@ -227,8 +240,8 @@ def render_step_cleaning():
     # Navigation
     st.divider()
     back_clicked, next_clicked = navigation_buttons(
-        back_label="Back to Rules",
-        next_label="Run Diagnostics",
+        back_label="Back to Diagnostics",
+        next_label="Run Diagnostics & Treatments",
     )
 
     if back_clicked:
@@ -292,7 +305,7 @@ def _render_column_cleaning(contract, col_config, col_name, data_type):
             "Remove punctuation",
             value=has_punct,
             key=f"clean_punct_{col_name}",
-            help=f"Removes: {PUNCTUATION_MARKS_REMOVED}",
+            help=f"Removes: {PUNCTUATION_MARKS_REMOVED}. WARNING: This will also remove decimal points! For numeric columns, use 'Clean numeric formatting' instead to strip only currency symbols and commas.",
         )
         _toggle_remediation(col_config, "remove_punctuation", punct_check, existing_rems)
 

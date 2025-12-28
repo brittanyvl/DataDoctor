@@ -106,7 +106,7 @@ def _render_start_options():
                 '<div style="background-color: #EDF2F7; padding: 20px; border-radius: 8px; '
                 'border: 2px solid #E2E8F0; text-align: center; height: 100%;">'
                 '<p style="font-weight: 600; color: #2D3748; margin-bottom: 8px;">Start Fresh</p>'
-                '<p style="color: #718096; font-size: 0.9rem;">Create new validation rules from scratch</p>'
+                '<p style="color: #718096; font-size: 0.9rem;">Create new diagnostic and treatment rules from scratch</p>'
                 '</div>',
                 unsafe_allow_html=True,
             )
@@ -119,7 +119,7 @@ def _render_start_options():
                 '<div style="background-color: #EDF2F7; padding: 20px; border-radius: 8px; '
                 'border: 2px solid #E2E8F0; text-align: center; height: 100%;">'
                 '<p style="font-weight: 600; color: #2D3748; margin-bottom: 8px;">Use Existing Contract</p>'
-                '<p style="color: #718096; font-size: 0.9rem;">Load a saved contract to validate data</p>'
+                '<p style="color: #718096; font-size: 0.9rem;">Load a saved contract to diagnose and treat data from saved settings</p>'
                 '</div>',
                 unsafe_allow_html=True,
             )
@@ -545,8 +545,6 @@ def _show_current_file():
 
 def _render_column_configuration():
     """Render column name configuration section with import options."""
-    st.subheader("Column Configuration")
-
     df = st.session_state.get("dataframe")
     if df is None:
         return
@@ -561,7 +559,7 @@ def _render_column_configuration():
 
     with col1:
         skip_rows = st.number_input(
-            "Skip first N rows (header from row N+1)",
+            "Skip first # rows",
             min_value=0,
             max_value=100,
             value=st.session_state.get("skip_rows", 0),
@@ -572,7 +570,7 @@ def _render_column_configuration():
 
     with col2:
         skip_footer = st.number_input(
-            "Skip last N rows",
+            "Skip last # rows",
             min_value=0,
             max_value=100,
             value=st.session_state.get("skip_footer_rows", 0),
@@ -586,7 +584,7 @@ def _render_column_configuration():
 
     with check_col1:
         skip_total_rows = st.checkbox(
-            "Skip rows containing 'total'",
+            "Drop rows containing totals",
             key="opt_skip_totals",
             help="Remove rows where any cell contains 'total' or 'grand total' (case insensitive)"
         )
@@ -619,12 +617,12 @@ def _render_column_configuration():
     st.divider()
 
     # ===== COLUMN OPTIONS SECTION =====
-    st.markdown("### Column Options")
+    st.markdown("### Select & Name Columns")
 
     # Case conversion on its own line
     case_options = ["No case change", "lowercase", "UPPERCASE", "Title Case"]
     case_selection = st.selectbox(
-        "Case conversion",
+        "Set text case for column names",
         options=case_options,
         index=0,
         key="opt_case",
@@ -634,14 +632,16 @@ def _render_column_configuration():
     to_uppercase = case_selection == "UPPERCASE"
     to_titlecase = case_selection == "Title Case"
 
-    # 4 checkboxes in 2x2 layout
-    col1, col2 = st.columns(2)
+    # 3 checkboxes in one row
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         trim_whitespace = st.checkbox("Trim whitespace", key="opt_trim")
-        remove_punctuation = st.checkbox("Remove punctuation", key="opt_remove_punct")
 
     with col2:
+        remove_punctuation = st.checkbox("Remove punctuation", key="opt_remove_punct")
+
+    with col3:
         replace_spaces = st.checkbox("Replace spaces with _", key="opt_replace_spaces")
 
     # Apply Changes button

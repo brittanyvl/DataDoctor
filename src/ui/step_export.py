@@ -12,7 +12,7 @@ import streamlit as st
 
 from src.contract.parser import serialize_contract_to_bytes, serialize_contract_to_yaml
 from src.file_handling.export import export_dataframe
-from src.reporting.html_report import generate_html_report_bytes
+from src.reporting.html_report import generate_pdf_report
 from src.session import set_current_step
 from src.ui.components import (
     step_header,
@@ -28,7 +28,7 @@ def render_step_export():
     """Render the export step."""
     step_header(
         5,
-        "Download Results",
+        "Download Data & Diagnostic Reports",
         "Download your cleaned data, reports, and rules.",
     )
 
@@ -76,14 +76,10 @@ def render_step_export():
                 help="If checked, labeled data and cleaned data will be on separate sheets in one .xlsx file. Otherwise, they will be separate files.",
             )
 
-    st.divider()
-
     # Download Complete Package (primary action - first)
     _render_zip_download(
         df, contract, validation_result, original_filename, base_name, format_ext, xlsx_multi_sheet
     )
-
-    st.divider()
 
     # Individual Downloads (optional)
     with st.expander("Individual Downloads", expanded=False):
@@ -104,19 +100,25 @@ def render_step_export():
 
     # Restart option - prominent call to action
     st.divider()
+    # Dark green styling for the button
     st.markdown(
-        '<style>.start-new-btn button { background-color: #2F855A !important; '
-        'color: white !important; font-weight: 600 !important; }</style>',
+        """<style>
+        div[data-testid="stButton"] > button[kind="primary"] {
+            background-color: #2F855A !important;
+            border-color: #2F855A !important;
+        }
+        div[data-testid="stButton"] > button[kind="primary"]:hover {
+            background-color: #276749 !important;
+            border-color: #276749 !important;
+        }
+        </style>""",
         unsafe_allow_html=True,
     )
-    with st.container():
-        st.markdown('<div class="start-new-btn">', unsafe_allow_html=True)
-        if st.button("🔄 Start New Analysis", use_container_width=True):
-            # Clear most session state but keep rate limiting
-            from src.session import reset_session_state
-            reset_session_state()
-            st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("🔄 Start New Analysis", use_container_width=True, type="primary"):
+        # Clear most session state but keep rate limiting
+        from src.session import reset_session_state
+        reset_session_state()
+        st.rerun()
 
 
 def _render_contract_export(contract, base_name):
@@ -159,11 +161,11 @@ def _render_zip_download(df, contract, validation_result, original_filename, bas
     remediation_diff = st.session_state.get("remediation_diff")
 
     # Build list of what's included
-    included_items = ["Labeled data (with error columns)", "Data quality report (HTML)", "Validation rules (YAML)"]
+    included_items = ["Labeled data (with error columns)", "Data quality report (PDF)", "Validation rules (YAML)"]
     if remediated_df is not None:
         included_items.insert(1, "Cleaned data")
     if remediation_diff and remediation_diff.cells_changed > 0:
-        included_items[1] = "Data quality report with cleansing summary (HTML)"
+        included_items[1] = "Data quality report with cleansing summary (PDF)"
 
     info_box("**Included in download:**\n- " + "\n- ".join(included_items))
 
@@ -223,14 +225,14 @@ def _create_export_zip(
                 cleaned_bytes, ext, _ = export_dataframe(remediated_df, output_format=format_ext, escape_formulas=True)
                 zf.writestr(f"{base_name}_cleaned{ext}", cleaned_bytes)
 
-        # HTML Report (includes data cleansing summary if available)
-        report_bytes = generate_html_report_bytes(
+        # PDF Report (includes data cleansing summary if available)
+        report_bytes = generate_pdf_report(
             validation_result,
             original_filename,
             contract.contract_id,
             remediation_diff,
         )
-        zf.writestr(f"{base_name}_report.html", report_bytes)
+        zf.writestr(f"{base_name}_report.pdf", report_bytes)
 
         # Contract YAML
         contract_bytes = serialize_contract_to_bytes(contract)
@@ -294,23 +296,23 @@ def _render_report_export(validation_result, original_filename, contract, base_n
     # Get remediation diff if available
     remediation_diff = st.session_state.get("remediation_diff")
 
-    # Generate HTML report (includes data cleansing summary if available)
-    report_bytes = generate_html_report_bytes(
+    # Generate PDF report (includes data cleansing summary if available)
+    report_bytes = generate_pdf_report(
         validation_result,
         original_filename,
         contract.contract_id,
         remediation_diff,
     )
 
-    report_label = "Data Quality Report (HTML)"
+    report_label = "Data Quality Report (PDF)"
     if remediation_diff and remediation_diff.cells_changed > 0:
-        report_label = "Data Quality Report with Cleansing Summary (HTML)"
+        report_label = "Data Quality Report with Cleansing Summary (PDF)"
 
     st.download_button(
         label=report_label,
         data=report_bytes,
-        file_name=f"{base_name}_report.html",
-        mime="text/html",
+        file_name=f"{base_name}_report.pdf",
+        mime="application/pdf",
         use_container_width=True,
     )
 
