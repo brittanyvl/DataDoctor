@@ -156,9 +156,9 @@ COMPARISON_OPERATORS = ["<", "<=", ">", ">=", "==", "!="]
 # UI step definitions (5-step workflow)
 UI_STEPS = [
     {"number": 1, "name": "Upload", "description": "Upload dataset and configure columns"},
-    {"number": 2, "name": "Rules", "description": "Define data quality rules"},
-    {"number": 3, "name": "Data Cleaning", "description": "Configure data cleaning options"},
-    {"number": 4, "name": "Findings", "description": "Review diagnostic findings"},
+    {"number": 2, "name": "Order Diagnostics", "description": "Define data quality rules"},
+    {"number": 3, "name": "Order Treatment", "description": "Configure data cleaning options"},
+    {"number": 4, "name": "Review Findings", "description": "Review diagnostic findings"},
     {"number": 5, "name": "Download", "description": "Download results"},
 ]
 

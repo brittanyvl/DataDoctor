@@ -440,33 +440,53 @@
         <div class="section">
             <h2>Data Cleansing Summary</h2>
             <div class="remediation-summary">
-                <p><strong>Rows Changed:</strong> {{ cleansing_summary.rows_changed | format_number }}</p>
-                <p><strong>Cells Changed:</strong> {{ cleansing_summary.cells_changed | format_number }}</p>
-                <p><strong>Columns Affected:</strong> {{ cleansing_summary.columns_affected | join(', ') }}</p>
+                <p><strong>Total Rows Changed:</strong> {{ cleansing_summary.rows_changed | format_number }}</p>
+                <p><strong>Total Cells Changed:</strong> {{ cleansing_summary.cells_changed | format_number }}</p>
             </div>
 
-            {% if cleansing_summary.sample_changes %}
-            <h3>Sample Changes</h3>
+            {% if cleansing_summary.column_stats %}
+            <h3>Column Changes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Cells Impacted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for col_stat in cleansing_summary.column_stats %}
+                    <tr>
+                        <td>{{ col_stat.column_name }}</td>
+                        <td>{{ col_stat.cells_changed | format_number }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if cleansing_summary.sample_changes_by_column %}
+            <h3>Sample Changes by Column</h3>
+            {% for col_name, changes in cleansing_summary.sample_changes_by_column.items() %}
+            <h4 style="margin-top: 20px; color: #2D3748;">{{ col_name }}</h4>
             <table>
                 <thead>
                     <tr>
                         <th>Row</th>
-                        <th>Column</th>
                         <th>Original Value</th>
                         <th>New Value</th>
                     </tr>
                 </thead>
                 <tbody>
-                {% for change in cleansing_summary.sample_changes %}
+                {% for change in changes %}
                     <tr>
                         <td>{{ change.row_index }}</td>
-                        <td>{{ change.column_name }}</td>
                         <td><code>{{ change.original_value }}</code></td>
                         <td><code>{{ change.new_value }}</code></td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+            {% endfor %}
             {% elif cleansing_summary.has_cached_data_issue %}
             <div class="warning-list">
                 <p><strong>Note:</strong> Sample changes could not be displayed. Please go back to Step 3 (Data Cleaning) and re-run the cleaning to see detailed changes.</p>

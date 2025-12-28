@@ -90,10 +90,9 @@ def render_step_contract():
         st.metric("Ignored", len(ignored_columns))
 
     # Configuration tabs
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2 = st.tabs([
         "Column Rules",
         "Dataset Tests",
-        "FK Checks",
     ])
 
     with tab1:
@@ -101,9 +100,6 @@ def render_step_contract():
 
     with tab2:
         _render_dataset_tests(contract, df, columns_to_configure)
-
-    with tab3:
-        _render_fk_checks(contract, df, columns_to_configure)
 
     # Navigation
     st.divider()

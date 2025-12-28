@@ -62,24 +62,118 @@ def get_custom_css() -> str:
             font-family: {FONT_MONO};
         }}
 
-        /* Sidebar title styling */
+        /* AGGRESSIVELY reduce main content top padding */
+        .main .block-container,
+        .stMainBlockContainer,
+        [data-testid="stMainBlockContainer"] {{
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+            max-width: 100% !important;
+        }}
+
+        /* Reduce Streamlit header height but keep toolbar visible */
+        .stApp > header,
+        [data-testid="stHeader"],
+        header[data-testid="stHeader"] {{
+            height: auto !important;
+            min-height: 0 !important;
+            background: transparent !important;
+        }}
+
+        /* Keep toolbar visible */
+        [data-testid="stDecoration"] {{
+            display: none !important;
+        }}
+
+        /* Remove top margin/padding from ALL main area containers */
+        .stApp,
+        [data-testid="stAppViewContainer"],
+        .stAppViewContainer {{
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }}
+
+        .main,
+        section.main,
+        [data-testid="stMain"] {{
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }}
+
+        /* Ensure first element has no top margin */
+        .main .block-container > div:first-child,
+        .stMainBlockContainer > div:first-child {{
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }}
+
+        /* Target the vertical block which often has margin */
+        .stVerticalBlock {{
+            gap: 0.5rem !important;
+        }}
+
+        .stVerticalBlock > div:first-child {{
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }}
+
+        /* Reduce sidebar padding - start content immediately */
+        [data-testid="stSidebar"] {{
+            padding-top: 0 !important;
+        }}
+
+        [data-testid="stSidebar"] > div:first-child {{
+            padding-top: 0.5rem !important;
+        }}
+
+        [data-testid="stSidebarContent"] {{
+            padding-top: 0.25rem !important;
+        }}
+
+        [data-testid="stSidebarUserContent"] {{
+            padding-top: 0.25rem !important;
+        }}
+
         [data-testid="stSidebarHeader"] {{
-            padding-bottom: 0;
+            padding-bottom: 0 !important;
+            display: none !important;
         }}
 
-        /* Main header styling */
-        .main-header {{
-            color: {BRAND_SLATE};
-            font-weight: 600;
-            margin-bottom: 0.25rem;
+        /* Main header styling - Data Doctor in GREEN with !important */
+        .dd-header {{
+            color: {BRAND_GREEN} !important;
+            font-size: 1.75rem !important;
+            font-weight: 700 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.2 !important;
         }}
 
-        /* Tagline styling */
-        .tagline {{
-            color: {BRAND_GREEN};
-            font-size: 0.9rem;
-            font-style: italic;
-            margin-bottom: 1rem;
+        /* Tagline styling - in slate/coal */
+        .dd-tagline {{
+            color: {BRAND_SLATE} !important;
+            font-size: 0.95rem !important;
+            font-style: italic !important;
+            margin: 0.25rem 0 0.75rem 0 !important;
+            padding: 0 !important;
+        }}
+
+        /* Sidebar header styling - BOLD GREEN */
+        .dd-sidebar-header {{
+            color: {BRAND_GREEN} !important;
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.2 !important;
+        }}
+
+        .dd-sidebar-tagline {{
+            color: {BRAND_SLATE} !important;
+            font-size: 0.8rem !important;
+            font-style: italic !important;
+            margin: 0.15rem 0 0 0 !important;
+            padding: 0 !important;
         }}
 
         /* Status badge base */
@@ -109,6 +203,11 @@ def get_custom_css() -> str:
         /* Metric styling */
         [data-testid="stMetricValue"] {{
             color: {BRAND_SLATE};
+        }}
+
+        /* Reduce spacing after dividers */
+        hr {{
+            margin: 0.5rem 0;
         }}
     </style>
     """

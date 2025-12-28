@@ -52,10 +52,13 @@ def main():
         render_privacy_page()
         return
 
-    # Render page header with branding
+    # Render page header with branding (green title, coal tagline)
+    # Using inline styles to guarantee they override Streamlit defaults
     st.markdown(
-        f'<h1 style="color: #2D3748; margin-bottom: 0;">Data Doctor</h1>'
-        f'<p style="color: #2F855A; font-style: italic; margin-top: 0; margin-bottom: 1rem;">{APP_TAGLINE}</p>',
+        f'<h1 style="color: #2F855A; font-size: 2.25rem; font-weight: 700; '
+        f'margin: 0 0 0.25rem 0; padding: 0; line-height: 1.1;">Data Doctor</h1>'
+        f'<p style="color: #2D3748; font-size: 1rem; font-style: italic; '
+        f'margin: 0 0 1rem 0; padding: 0;">{APP_TAGLINE}</p>',
         unsafe_allow_html=True,
     )
 
@@ -90,24 +93,24 @@ def _render_sidebar():
     STEP_NUMBERS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
 
     with st.sidebar:
-        # Branding header
+        # Branding header (green title, coal tagline) - compact with inline styles
         st.markdown(
-            f'<h2 style="color: #2D3748; margin-bottom: 0;">{APP_NAME}</h2>'
-            f'<p style="color: #2F855A; font-size: 0.85rem; font-style: italic; margin-top: 0;">'
-            f'{APP_TAGLINE}</p>',
+            f'<p style="color: #2F855A !important; font-size: 1.25rem; font-weight: 700; '
+            f'margin: 0; padding: 0; line-height: 1.2;">{APP_NAME}</p>'
+            f'<p style="color: #2D3748 !important; font-size: 0.8rem; font-style: italic; '
+            f'margin: 0.15rem 0 0.75rem 0; padding: 0;">{APP_TAGLINE}</p>',
             unsafe_allow_html=True,
         )
-        st.caption(f"Version {APP_VERSION}")
 
-        st.markdown("---")
-
-        # Start Over button - above workflow
-        if st.button("🔄 Start Over", use_container_width=True, help="Clear all data and start a new analysis"):
+        # Clear Session button
+        if st.button("🗑️ Clear Session", use_container_width=True, help="Clear all data and start fresh"):
             from src.session import reset_session_state
             reset_session_state()
+            st.balloons()
             st.rerun()
 
-        st.markdown("---")
+        # Compact divider with less top margin
+        st.markdown('<hr style="margin: 0.25rem 0 0.5rem 0;">', unsafe_allow_html=True)
 
         # Step navigation with number emojis
         st.markdown("### Workflow")

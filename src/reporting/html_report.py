@@ -81,31 +81,40 @@ def generate_html_report(
     # Prepare data cleansing summary if available
     cleansing_summary = None
     if remediation_diff:
-        # Collect ALL changes (not just samples), filtering out null-to-null
-        all_changes = []
+        # Build per-column statistics and sample changes (up to 20 per column)
+        column_stats = []
+        sample_changes_by_column = {}
+
         for col_name, col_diff in remediation_diff.column_diffs.items():
+            # Filter out null-to-null changes
+            real_changes = []
             for change in col_diff.sample_changes:
-                # Skip null-to-null (not a real change - bug in cached data)
                 if _is_null(change.original_value) and _is_null(change.new_value):
                     continue
-                all_changes.append({
+                real_changes.append({
                     "row_index": change.row_index,
                     "column_name": change.column_name,
                     "original_value": _format_value(change.original_value),
                     "new_value": _format_value(change.new_value),
                 })
 
-        # Use filtered sample (first 20 real changes)
-        sample_changes = all_changes[:20]
+            # Only include columns with actual changes
+            if col_diff.changed_count > 0:
+                column_stats.append({
+                    "column_name": col_name,
+                    "cells_changed": col_diff.changed_count,
+                })
 
-        # If we have changes to show, include the summary
-        # Note: counts may be inflated due to cached null-to-null bug
+                # Store up to 20 sample changes per column
+                if real_changes:
+                    sample_changes_by_column[col_name] = real_changes[:20]
+
         cleansing_summary = {
             "rows_changed": remediation_diff.rows_changed,
             "cells_changed": remediation_diff.cells_changed,
-            "columns_affected": remediation_diff.columns_affected,
-            "sample_changes": sample_changes,
-            "has_cached_data_issue": len(sample_changes) == 0 and remediation_diff.cells_changed > 0,
+            "column_stats": column_stats,
+            "sample_changes_by_column": sample_changes_by_column,
+            "has_cached_data_issue": len(sample_changes_by_column) == 0 and remediation_diff.cells_changed > 0,
         }
 
     # Render template

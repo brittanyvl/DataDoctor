@@ -2,7 +2,7 @@
 Step 1: Upload dataset and configure columns.
 
 This module implements the file upload step of the Data Doctor workflow,
-including column name configuration, FK file handling, and contract upload.
+including column name configuration and contract upload options.
 """
 
 import streamlit as st
@@ -47,12 +47,11 @@ from src.contract.schema import dict_to_contract
 
 def render_step_upload():
     """Render the file upload step."""
-    # Step header with upload limits in description
-    step_header(
-        1,
-        "Upload Dataset",
-        f"Upload your data file (max {MAX_UPLOAD_SIZE_MB}MB, {MAX_ROW_COUNT:,} rows, {MAX_COLUMN_COUNT} columns). "
-        f"Supported formats: {', '.join(sorted(SUPPORTED_EXTENSIONS))}",
+    # Compact step header without extra description
+    st.markdown("### Step 1: Upload Dataset")
+    st.caption(
+        f"Max {MAX_UPLOAD_SIZE_MB}MB, {MAX_ROW_COUNT:,} rows, {MAX_COLUMN_COUNT} columns. "
+        f"Formats: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
     )
 
     # Check rate limit
@@ -63,17 +62,15 @@ def render_step_upload():
         )
         return
 
-    # File upload section
-    _render_file_upload_section()
-
-    # Show current file info and column config if already uploaded
+    # Check if we have a file loaded already
     df = st.session_state.get("dataframe")
-    if df is not None:
+
+    if df is None:
+        # Show the two-path selection
+        _render_start_options()
+    else:
+        # File is loaded - show configuration
         _show_current_file()
-
-        st.divider()
-
-        # Column configuration section (includes import options)
         _render_column_configuration()
 
         # Navigation
@@ -91,9 +88,58 @@ def render_step_upload():
             st.rerun()
 
 
-def _render_file_upload_section():
-    """Render the file upload section with support for multi-sheet Excel and FK files."""
-    st.subheader("Data Files")
+def _render_start_options():
+    """Render the two starting options: Start Fresh or Use Existing Contract."""
+    # Check what mode we're in
+    upload_mode = st.session_state.get("upload_mode", None)
+
+    if upload_mode is None:
+        # Show the two options
+        st.markdown("**How would you like to start?**")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown(
+                '<div style="background-color: #EDF2F7; padding: 20px; border-radius: 8px; '
+                'border: 2px solid #E2E8F0; text-align: center; height: 100%;">'
+                '<p style="font-weight: 600; color: #2D3748; margin-bottom: 8px;">Start Fresh</p>'
+                '<p style="color: #718096; font-size: 0.9rem;">Create new validation rules from scratch</p>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("📄 Start Fresh", use_container_width=True, type="primary"):
+                st.session_state["upload_mode"] = "fresh"
+                st.rerun()
+
+        with col2:
+            st.markdown(
+                '<div style="background-color: #EDF2F7; padding: 20px; border-radius: 8px; '
+                'border: 2px solid #E2E8F0; text-align: center; height: 100%;">'
+                '<p style="font-weight: 600; color: #2D3748; margin-bottom: 8px;">Use Existing Contract</p>'
+                '<p style="color: #718096; font-size: 0.9rem;">Load a saved contract to validate data</p>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("📋 Use Existing Contract", use_container_width=True):
+                st.session_state["upload_mode"] = "contract"
+                st.rerun()
+
+    elif upload_mode == "fresh":
+        _render_fresh_upload()
+
+    elif upload_mode == "contract":
+        _render_contract_upload()
+
+
+def _render_fresh_upload():
+    """Render the fresh upload flow - just file upload."""
+    # Back button
+    if st.button("← Back to options"):
+        st.session_state["upload_mode"] = None
+        st.rerun()
+
+    st.markdown("**Upload your data file**")
 
     # Check if we're in sheet selection mode
     pending_file = st.session_state.get("pending_file_content")
@@ -101,58 +147,62 @@ def _render_file_upload_section():
         _render_sheet_selection()
         return
 
-    # Get uploader version for key generation (used to reset uploaders on clear)
     uploader_version = st.session_state.get("uploader_version", 0)
 
-    # Primary data file uploader
-    st.markdown("**Primary Data File**")
     primary_file = st.file_uploader(
-        "Choose your main data file",
+        "Choose your data file",
         type=[ext.lstrip('.') for ext in SUPPORTED_EXTENSIONS],
         help="Upload a CSV or Excel file containing your data",
         key=f"primary_file_uploader_v{uploader_version}",
     )
 
-    # Optional uploads section (FK file and Contract)
-    with st.expander("Optional: Load Contract or FK Reference File", expanded=False):
-        st.markdown("**Load Existing Contract**")
-        st.caption(
-            "If you have a contract from a previous run, upload it here to "
-            "automatically apply column settings, skip rows, and ignore columns."
-        )
+    if primary_file is not None:
+        _handle_primary_file(primary_file)
+
+
+def _render_contract_upload():
+    """Render the contract-first upload flow."""
+    # Back button
+    if st.button("← Back to options"):
+        st.session_state["upload_mode"] = None
+        if "uploaded_contract" in st.session_state:
+            del st.session_state["uploaded_contract"]
+        st.rerun()
+
+    uploader_version = st.session_state.get("uploader_version", 0)
+
+    # Check if contract is already loaded
+    if st.session_state.get("uploaded_contract") is None:
+        st.markdown("**Step 1: Upload your contract**")
         contract_file = st.file_uploader(
             "Choose contract YAML file",
             type=["yaml", "yml"],
-            help="Upload a Data Doctor contract to restore import settings",
+            help="Upload a Data Doctor contract from a previous run",
             key=f"contract_file_uploader_v{uploader_version}",
         )
 
         if contract_file is not None:
             _handle_contract_upload(contract_file)
+    else:
+        success_box("Contract loaded successfully!")
 
-        st.markdown("---")
+        st.markdown("**Step 2: Upload data file to validate**")
 
-        st.markdown("**Foreign Key Reference File**")
-        st.caption(
-            "Upload a file containing valid values for foreign key validation. "
-            "You can also select a sheet from multi-sheet Excel files."
-        )
-        fk_file = st.file_uploader(
-            "Choose FK reference file",
+        # Check if we're in sheet selection mode
+        pending_file = st.session_state.get("pending_file_content")
+        if pending_file is not None:
+            _render_sheet_selection()
+            return
+
+        primary_file = st.file_uploader(
+            "Choose your data file",
             type=[ext.lstrip('.') for ext in SUPPORTED_EXTENSIONS],
-            help="Optional: Upload a file containing valid FK values",
-            key=f"fk_file_uploader_v{uploader_version}",
+            help="Upload a CSV or Excel file to validate against the contract",
+            key=f"contract_data_uploader_v{uploader_version}",
         )
 
-        # Handle FK file upload (only if primary is loaded)
-        if fk_file is not None and st.session_state.get("dataframe") is not None:
-            _handle_fk_file(fk_file)
-        elif fk_file is not None:
-            info_box("Upload a primary data file first, then the FK reference will be processed.")
-
-    # Handle primary file upload
-    if primary_file is not None:
-        _handle_primary_file(primary_file)
+        if primary_file is not None:
+            _handle_primary_file(primary_file)
 
 
 def _handle_primary_file(uploaded_file):
@@ -213,41 +263,24 @@ def _render_sheet_selection():
     sheets = st.session_state.get("available_sheets", [])
     filename = st.session_state.get("pending_file_name", "")
 
-    st.info(f"**{filename}** contains {len(sheets)} sheets. Please select which sheets to use.")
+    st.info(f"**{filename}** contains {len(sheets)} sheets. Please select which sheet to use.")
+
+    primary_sheet = st.selectbox(
+        "Select sheet containing your data",
+        options=sheets,
+        key="primary_sheet_select",
+    )
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**Primary Data Sheet**")
-        primary_sheet = st.selectbox(
-            "Select sheet containing your main data",
-            options=sheets,
-            key="primary_sheet_select",
-        )
-
-    with col2:
-        st.markdown("**FK Reference Sheet (Optional)**")
-        fk_options = ["(None)"] + sheets
-        fk_sheet = st.selectbox(
-            "Select sheet containing FK reference values",
-            options=fk_options,
-            key="fk_sheet_select",
-        )
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button("Load Selected Sheets", type="primary", use_container_width=True):
+        if st.button("Load Sheet", type="primary", use_container_width=True):
             file_content = st.session_state["pending_file_content"]
             file_ext = st.session_state["pending_file_ext"]
             file_hash = st.session_state["pending_file_hash"]
 
             # Load primary data
             _load_primary_data(file_content, filename, file_ext, primary_sheet, file_hash)
-
-            # Load FK sheet if selected
-            if fk_sheet != "(None)":
-                _load_fk_data(file_content, file_ext, fk_sheet, is_sheet=True)
 
             # Clear pending state
             _clear_pending_file_state()
@@ -321,48 +354,6 @@ def _load_primary_data(file_content, filename, file_ext, sheet_name, file_hash):
 
     finally:
         set_processing(False)
-
-
-def _handle_fk_file(fk_file):
-    """Handle FK file upload."""
-    file_content = fk_file.read()
-    fk_file.seek(0)
-
-    validation_result = validate_upload(
-        fk_file.name,
-        len(file_content),
-        fk_file.type,
-    )
-
-    if not validation_result.is_valid:
-        error_box(f"FK file error: {validation_result.error_message}")
-        return
-
-    file_ext = validation_result.file_extension
-
-    # For Excel, use first sheet
-    sheet_name = None
-    if file_ext in {".xlsx", ".xls", ".xlsb"}:
-        sheet_result = get_excel_sheet_names(file_content, file_ext)
-        if sheet_result.success and sheet_result.sheet_names:
-            sheet_name = sheet_result.sheet_names[0]
-
-    _load_fk_data(file_content, file_ext, sheet_name, is_sheet=False, filename=fk_file.name)
-
-
-def _load_fk_data(file_content, file_ext, sheet_name, is_sheet=False, filename=None):
-    """Load FK reference data."""
-    read_result = read_file(
-        file_content,
-        filename or "fk_data",
-        file_ext,
-        sheet_name=sheet_name,
-    )
-
-    if read_result.success:
-        st.session_state["fk_dataframe"] = read_result.dataframe
-        st.session_state["fk_source"] = f"sheet: {sheet_name}" if is_sheet else filename
-        success_box(f"FK reference loaded: {sheet_name if is_sheet else filename}")
 
 
 def _handle_contract_upload(contract_file):
@@ -502,7 +493,7 @@ def _clear_session():
         "dataframe", "uploaded_file_name", "file_hash", "file_content",
         "file_ext", "sheet_name", "applied_skip_rows", "applied_skip_footer_rows",
         "skip_rows", "skip_footer_rows", "column_renames", "columns_to_ignore",
-        "ignored_columns", "fk_dataframe", "fk_source", "uploaded_contract",
+        "ignored_columns", "uploaded_contract", "upload_mode",
         "loaded_contract_hash", "pending_import_settings", "contract",
         "contract_source", "validation_results", "remediated_df",
         "remediation_approved", "column_config_version", "applied_quick_actions",
@@ -528,16 +519,7 @@ def _show_current_file():
     filename = st.session_state.get("uploaded_file_name", "Unknown")
     sheet_name = st.session_state.get("sheet_name")
 
-    # Header row with title and Clear Session button
-    header_col1, header_col2 = st.columns([3, 1])
-
-    with header_col1:
-        st.subheader("Loaded Data")
-
-    with header_col2:
-        if st.button("Clear Session", type="secondary", help="Clear all data and start over"):
-            _clear_session()
-            st.rerun()
+    st.subheader("Loaded Data")
 
     col1, col2, col3 = st.columns(3)
 
@@ -553,12 +535,6 @@ def _show_current_file():
 
     if sheet_name:
         st.caption(f"Sheet: {sheet_name}")
-
-    # Show FK status if loaded
-    fk_df = st.session_state.get("fk_dataframe")
-    if fk_df is not None:
-        fk_source = st.session_state.get("fk_source", "Unknown")
-        st.caption(f"FK Reference: {fk_source} ({len(fk_df):,} rows)")
 
     # Data preview
     data_preview(df, max_rows=10, title="Data Preview")

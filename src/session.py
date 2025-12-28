@@ -26,6 +26,9 @@ def initialize_session_state() -> None:
         # Current UI step (1-6)
         "current_step": 1,
 
+        # Upload mode selection
+        "upload_mode": None,  # "fresh" or "contract"
+
         # File upload state
         "uploaded_file": None,
         "uploaded_file_name": None,
@@ -35,11 +38,6 @@ def initialize_session_state() -> None:
         "dataframe": None,
         "sheet_name": None,
         "available_sheets": [],
-
-        # Foreign key file (optional)
-        "fk_file": None,
-        "fk_dataframe": None,
-        "fk_column": None,
 
         # Contract state
         "contract": None,
