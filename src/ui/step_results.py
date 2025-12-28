@@ -22,6 +22,7 @@ from src.ui.components import (
     navigation_buttons,
     status_badge,
     collapsible_section,
+    demo_tip,
 )
 from src.validation.engine import (
     run_validation,
@@ -36,6 +37,12 @@ def render_step_results():
         4,
         "Diagnostic Findings",
         "Review data quality summary and diagnostic findings.",
+    )
+
+    # Show demo tip if in demo mode
+    demo_tip(
+        "Found issues! Expand 'Sample Failures' below to see specific errors. "
+        "The Data Cleansing Applied section shows what was automatically fixed."
     )
 
     # Check prerequisites
@@ -70,7 +77,7 @@ def render_step_results():
     st.divider()
     back_clicked, next_clicked = navigation_buttons(
         back_label="Back to Data Cleaning",
-        next_label="Download Results",
+        next_label="Access Full Downloads",
     )
 
     if back_clicked:

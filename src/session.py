@@ -27,7 +27,10 @@ def initialize_session_state() -> None:
         "current_step": 1,
 
         # Upload mode selection
-        "upload_mode": None,  # "fresh" or "contract"
+        "upload_mode": None,  # "fresh", "contract", or "demo"
+
+        # Demo mode flag
+        "is_demo_mode": False,
 
         # File upload state
         "uploaded_file": None,

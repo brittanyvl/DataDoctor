@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        @page {
+            size: landscape;
+            margin: 0.5in;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,107 +21,126 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            line-height: 1.6;
+            line-height: 1.5;
             color: #2D3748;
-            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 15px;
+            background-color: #fff;
+            font-size: 11px;
         }
 
         .report-container {
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 30px;
         }
 
         .header {
             border-bottom: 2px solid #2F855A;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .header .brand-name {
             color: #2F855A;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 2px;
         }
 
         .header .tagline {
             color: #2D3748;
-            font-size: 14px;
+            font-size: 11px;
             font-style: italic;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .header .report-title {
             color: #2D3748;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         code, pre {
             font-family: 'JetBrains Mono', SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+            font-size: 10px;
         }
 
         .header .meta {
             color: #666;
-            font-size: 14px;
+            font-size: 11px;
+        }
+
+        .header .meta-line {
+            display: inline;
+        }
+
+        .header .meta-separator {
+            color: #999;
+            margin: 0 8px;
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .section h2 {
             color: #333;
-            font-size: 20px;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
             border-bottom: 1px solid #ddd;
         }
 
         .section h3 {
             color: #555;
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
         }
 
+        /* KPI Cards - horizontal row */
         .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+            margin-bottom: 15px;
         }
 
         .summary-card {
+            display: table-cell;
             background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 12px 8px;
+            border: 1px solid #e2e8f0;
+            padding: 10px 5px;
             text-align: center;
+            vertical-align: middle;
+        }
+
+        .summary-card:first-child {
+            border-radius: 6px 0 0 6px;
+        }
+
+        .summary-card:last-child {
+            border-radius: 0 6px 6px 0;
         }
 
         .summary-card .value {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: #2F855A;
         }
 
         .summary-card .label {
-            font-size: 10px;
+            font-size: 9px;
             color: #666;
             text-transform: uppercase;
             line-height: 1.2;
+            margin-top: 2px;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
         }
@@ -139,44 +163,59 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 15px;
+            font-size: 10px;
         }
 
         th, td {
-            padding: 10px 12px;
+            padding: 6px 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         th {
             background-color: #EDF2F7;
             font-weight: 600;
             color: #2D3748;
+            white-space: nowrap;
         }
 
-        tr:hover {
-            background-color: #f5f5f5;
+        /* Sample Failures table - specific column widths */
+        .failures-table th:nth-child(1),
+        .failures-table td:nth-child(1) {
+            width: 5%;
+            text-align: center;
         }
 
-        .column-status-good {
-            color: #2F855A;
+        .failures-table th:nth-child(2),
+        .failures-table td:nth-child(2) {
+            width: 15%;
         }
 
-        .column-status-warning {
-            color: #D69E2E;
+        .failures-table th:nth-child(3),
+        .failures-table td:nth-child(3) {
+            width: 12%;
         }
 
-        .column-status-critical {
-            color: #C53030;
+        .failures-table th:nth-child(4),
+        .failures-table td:nth-child(4) {
+            width: 20%;
+        }
+
+        .failures-table th:nth-child(5),
+        .failures-table td:nth-child(5) {
+            width: 48%;
         }
 
         .error-list {
             background-color: #fff5f5;
             border: 1px solid #f8d7da;
             border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
         .error-list ul {
@@ -184,15 +223,15 @@
         }
 
         .error-list li {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .warning-list {
             background-color: #fffbeb;
             border: 1px solid #fff3cd;
             border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
         .warning-list ul {
@@ -203,49 +242,23 @@
             background-color: #e8f4fd;
             border: 1px solid #bee5eb;
             border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
         .footer {
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 15px;
             border-top: 1px solid #ddd;
             text-align: center;
             color: #666;
-            font-size: 12px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background-color: #2F855A;
-            transition: width 0.3s;
-        }
-
-        .progress-bar-fill.warning {
-            background-color: #D69E2E;
-        }
-
-        .progress-bar-fill.danger {
-            background-color: #C53030;
+            font-size: 10px;
         }
 
         @media print {
             body {
                 background-color: #fff;
                 padding: 0;
-            }
-
-            .report-container {
-                box-shadow: none;
             }
         }
     </style>
@@ -257,9 +270,11 @@
             <p class="tagline">Diagnose and treat your spreadsheet ailments.</p>
             <div class="report-title">Data Quality Report</div>
             <div class="meta">
-                <p><strong>File:</strong> {{ filename }}</p>
-                <p><strong>Generated:</strong> {{ generated_at }}</p>
-                <p><strong>Contract ID:</strong> {{ contract_id }}</p>
+                <span class="meta-line"><strong>File:</strong> {{ filename }}</span>
+                <span class="meta-separator">|</span>
+                <span class="meta-line"><strong>Generated:</strong> {{ generated_at }}</span>
+                <span class="meta-separator">|</span>
+                <span class="meta-line"><strong>Contract ID:</strong> {{ contract_id }}</span>
             </div>
         </div>
 
@@ -267,26 +282,26 @@
             <h2>Diagnostic Summary</h2>
 
             <!-- Full-width status banner -->
-            <div style="margin-bottom: 20px; padding: 15px; border-radius: 6px; text-align: center; {% if summary.is_valid %}background-color: #C6F6D5; border: 1px solid #9AE6B4;{% else %}background-color: #FED7D7; border: 1px solid #FEB2B2;{% endif %}">
+            <div style="margin-bottom: 12px; padding: 10px; border-radius: 6px; text-align: center; {% if summary.is_valid %}background-color: #C6F6D5; border: 1px solid #9AE6B4;{% else %}background-color: #FED7D7; border: 1px solid #FEB2B2;{% endif %}">
                 {% if summary.is_valid %}
-                <span class="status-badge status-pass" style="font-size: 16px; padding: 8px 24px;">PASS – All Checks Passed</span>
+                <span class="status-badge status-pass" style="font-size: 12px; padding: 6px 16px;">PASS – All Checks Passed</span>
                 {% else %}
-                <span class="status-badge status-fail" style="font-size: 16px; padding: 8px 24px;">ISSUES FOUND – {{ summary.errors }} Issues Need Attention</span>
+                <span class="status-badge status-fail" style="font-size: 12px; padding: 6px 16px;">ISSUES FOUND – {{ summary.errors }} Issues Need Attention</span>
                 {% endif %}
             </div>
 
             <div class="summary-grid">
                 <div class="summary-card">
                     <div class="value">{{ summary.total_rows | format_number }}</div>
-                    <div class="label">Total Rows Checked</div>
+                    <div class="label">Total Rows</div>
                 </div>
                 <div class="summary-card">
                     <div class="value">{{ summary.total_columns }}</div>
-                    <div class="label">Total Columns Checked</div>
+                    <div class="label">Columns</div>
                 </div>
                 <div class="summary-card">
                     <div class="value">{{ summary.tests_passed }} / {{ summary.tests_run }}</div>
-                    <div class="label">Total Tests Passed</div>
+                    <div class="label">Tests Passed</div>
                 </div>
                 <div class="summary-card">
                     <div class="value">{{ summary.rows_with_errors | format_number }}</div>
@@ -377,6 +392,36 @@
                 {% endfor %}
                 </tbody>
             </table>
+
+            {% for test in dataset_test_results %}
+            {% if not test.passed and test.affected_rows %}
+            <h3 style="margin-top: 15px;">{{ test.details.rule_name if test.details.rule_name else test.test_type }} - Failed Rows</h3>
+            <p style="font-size: 11px; color: #666; margin-bottom: 8px;">
+                <strong>Rule Expression:</strong> <code>{{ test.details.expression if test.details.expression else 'N/A' }}</code> |
+                <strong>Rows Failed:</strong> {{ test.affected_rows | length }}
+            </p>
+            <table class="failures-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">Row</th>
+                        <th style="width: 25%;">Fields Inspected</th>
+                        <th style="width: 30%;">Rule Failed</th>
+                        <th style="width: 37%;">Error Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row_idx in test.affected_rows %}
+                    <tr>
+                        <td>{{ row_idx }}</td>
+                        <td>{% if test.details.fields_inspected %}{{ test.details.fields_inspected | join(', ') }}{% else %}See expression{% endif %}</td>
+                        <td>{{ test.details.rule_name if test.details.rule_name else test.test_type }}</td>
+                        <td>Assertion failed: <code>{{ test.details.expression if test.details.expression else 'N/A' }}</code></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% endfor %}
         </div>
         {% endif %}
 
@@ -417,7 +462,7 @@
         {% if failed_examples %}
         <div class="section">
             <h2>Sample Failures</h2>
-            <table>
+            <table class="failures-table">
                 <thead>
                     <tr>
                         <th>Row</th>
@@ -433,7 +478,7 @@
                         <td>{{ example.row_index }}</td>
                         <td>{{ example.column_name }}</td>
                         <td>{{ example.test_type }}</td>
-                        <td>{{ example.original_value }}</td>
+                        <td><code>{{ example.original_value }}</code></td>
                         <td>{{ example.error_message }}</td>
                     </tr>
                 {% endfor %}
@@ -446,8 +491,8 @@
         <div class="section">
             <h2>Data Cleansing Summary</h2>
             <div class="remediation-summary">
-                <p><strong>Total Rows Changed:</strong> {{ cleansing_summary.rows_changed | format_number }}</p>
-                <p><strong>Total Cells Changed:</strong> {{ cleansing_summary.cells_changed | format_number }}</p>
+                <strong>Total Rows Changed:</strong> {{ cleansing_summary.rows_changed | format_number }} &nbsp;|&nbsp;
+                <strong>Total Cells Changed:</strong> {{ cleansing_summary.cells_changed | format_number }}
             </div>
 
             {% if cleansing_summary.column_stats %}
@@ -457,6 +502,7 @@
                     <tr>
                         <th>Column</th>
                         <th>Cells Impacted</th>
+                        <th>Treatments Applied</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -464,6 +510,7 @@
                     <tr>
                         <td>{{ col_stat.column_name }}</td>
                         <td>{{ col_stat.cells_changed | format_number }}</td>
+                        <td>{{ col_stat.treatments }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -471,15 +518,16 @@
             {% endif %}
 
             {% if cleansing_summary.sample_changes_by_column %}
-            <h3>Sample Changes by Column</h3>
+            <h3>All Data Changes</h3>
             {% for col_name, changes in cleansing_summary.sample_changes_by_column.items() %}
-            <h4 style="margin-top: 20px; color: #2D3748;">{{ col_name }}</h4>
+            <h4 style="margin-top: 12px; color: #2D3748; font-size: 11px;">{{ col_name }}</h4>
             <table>
                 <thead>
                     <tr>
-                        <th>Row</th>
-                        <th>Original Value</th>
-                        <th>New Value</th>
+                        <th style="width: 8%;">Row</th>
+                        <th style="width: 30%;">Original Value</th>
+                        <th style="width: 30%;">New Value</th>
+                        <th style="width: 32%;">Treatments Applied</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -488,6 +536,7 @@
                         <td>{{ change.row_index }}</td>
                         <td><code>{{ change.original_value }}</code></td>
                         <td><code>{{ change.new_value }}</code></td>
+                        <td>{{ change.treatments }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

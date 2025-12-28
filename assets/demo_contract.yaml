@@ -1,0 +1,281 @@
+# Data Doctor Demo Contract
+# Pre-configured validation rules for the demo dataset
+
+contract_version: "1.0"
+contract_id: "demo-contract-001"
+created_at_utc: "2024-01-01T00:00:00Z"
+
+app:
+  name: "Data Doctor"
+  version: "1.0.0"
+
+limits:
+  max_upload_mb: 75
+  max_rows: 250000
+  max_columns: 100
+
+dataset:
+  row_limit_behavior:
+    reject_if_over_limit: true
+  contract_basis_filename: "demo_data.csv"
+  import_settings:
+    skip_rows: 0
+    skip_footer_rows: 0
+    column_renames: {}
+    columns_to_ignore: []
+    quick_actions:
+      to_lowercase: false
+      to_uppercase: false
+      to_titlecase: false
+      trim_whitespace: false
+      remove_punctuation: false
+      replace_spaces_with_underscores: false
+
+columns:
+  - name: order_id
+    data_type: integer
+    required: true
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: uniqueness
+        severity: error
+        params: {}
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: customer_name
+    data_type: text
+    required: true
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests: []
+    remediation:
+      - type: trim_whitespace
+        params: {}
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: email
+    data_type: text
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: pattern
+        severity: error
+        params:
+          tier: preset
+          preset_name: email
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: phone
+    data_type: text
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: pattern
+        severity: error
+        params:
+          tier: preset
+          preset_name: phone_us
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: quantity
+    data_type: integer
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: range
+        severity: error
+        params:
+          min: 1
+          max: 1000
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: unit_price
+    data_type: float
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: range
+        severity: error
+        params:
+          min: 0
+          max: 10000
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: discount_pct
+    data_type: integer
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: range
+        severity: error
+        params:
+          min: 0
+          max: 100
+    remediation:
+      - type: remove_punctuation
+        params: {}
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: order_date
+    data_type: date
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: date_rule
+        severity: error
+        params:
+          target_format: "YYYY-MM-DD"
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: ship_date
+    data_type: date
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: date_rule
+        severity: error
+        params:
+          target_format: "YYYY-MM-DD"
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: is_priority
+    data_type: boolean
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests: []
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: status
+    data_type: text
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: enum
+        severity: error
+        params:
+          tier: custom
+          allowed_values:
+            - pending
+            - processing
+            - shipped
+            - delivered
+            - cancelled
+          case_insensitive: true
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+  - name: state_code
+    data_type: text
+    required: false
+    normalization:
+      trim_whitespace: true
+      null_tokens: ["", "NA", "N/A", "null", "None"]
+      case: none
+      remove_non_printable: true
+    tests:
+      - type: enum
+        severity: error
+        params:
+          preset: us_state_2_letter
+          case_insensitive: false
+    remediation: []
+    failure_handling:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+
+dataset_tests:
+  - type: cross_field_rule
+    severity: error
+    on_fail:
+      action: label_failure
+      label_column_name: "__data_doctor_errors__"
+    params:
+      rule_name: "Ship date must be on or after order date"
+      if:
+        all_not_null:
+          - order_date
+          - ship_date
+      assert:
+        expression: "ship_date >= order_date"
+
+foreign_key_checks: []
+
+exports:
+  report_html: true
+  cleaned_dataset: true
+  contract_yaml: true
+  remediation_summary: false
+  output_format: csv

@@ -30,6 +30,11 @@ class ColumnDiff:
     changed_count: int
     change_rate_percent: float
     sample_changes: list[CellChange]
+    treatments_applied: list[str] = None  # List of treatment names applied to this column
+
+    def __post_init__(self):
+        if self.treatments_applied is None:
+            self.treatments_applied = []
 
 
 @dataclass
@@ -49,6 +54,7 @@ def compute_diff(
     original_df: pd.DataFrame,
     remediated_df: pd.DataFrame,
     max_samples_per_column: int = 10,
+    column_treatments: Optional[dict[str, list[str]]] = None,
 ) -> RemediationDiff:
     """
     Compute the diff between original and remediated DataFrames.
@@ -57,6 +63,7 @@ def compute_diff(
         original_df: The original DataFrame
         remediated_df: The remediated DataFrame
         max_samples_per_column: Max sample changes to include per column
+        column_treatments: Optional dict mapping column names to list of treatment names
 
     Returns:
         RemediationDiff with change details
@@ -65,6 +72,7 @@ def compute_diff(
     row_changes: dict[int, int] = {}
     total_cells_changed = 0
     columns_affected = []
+    column_treatments = column_treatments or {}
 
     # Compare each column
     for col in original_df.columns:
@@ -114,6 +122,7 @@ def compute_diff(
                 changed_count=changed_count,
                 change_rate_percent=round(change_rate, 2),
                 sample_changes=sample_changes,
+                treatments_applied=column_treatments.get(col, []),
             )
 
     rows_changed = len(row_changes)

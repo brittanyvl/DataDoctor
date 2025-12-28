@@ -120,6 +120,41 @@ def transform_remove_non_printable(
     return series.apply(remove_non_printable)
 
 
+def transform_remove_punctuation(
+    series: pd.Series,
+    params: Optional[dict] = None,
+) -> pd.Series:
+    """
+    Remove punctuation characters from string values.
+
+    Useful for cleaning numeric fields that contain formatting like
+    percentages (15%), currency ($100), or other punctuation.
+
+    Args:
+        series: The column data
+        params: Dict with optional:
+            - keep_chars: string of punctuation chars to keep (e.g., ".-" to keep decimals and negatives)
+
+    Returns:
+        Transformed series
+    """
+    import string
+
+    params = params or {}
+    keep_chars = set(params.get("keep_chars", ""))
+
+    # Build set of punctuation to remove (excluding any we want to keep)
+    punctuation_to_remove = set(string.punctuation) - keep_chars
+
+    def remove_punctuation(value: Any) -> Any:
+        if pd.isna(value):
+            return value
+        str_value = str(value)
+        return "".join(c for c in str_value if c not in punctuation_to_remove)
+
+    return series.apply(remove_punctuation)
+
+
 def transform_numeric_cleanup(
     series: pd.Series,
     params: Optional[dict] = None,
@@ -432,6 +467,7 @@ COLUMN_TRANSFORMERS: dict[str, Callable] = {
     "standardize_nulls": transform_standardize_nulls,
     "normalize_case": transform_normalize_case,
     "remove_non_printable": transform_remove_non_printable,
+    "remove_punctuation": transform_remove_punctuation,
     "numeric_cleanup": transform_numeric_cleanup,
     "boolean_normalization": transform_boolean_normalization,
     "date_coerce": transform_date_coerce,

@@ -24,6 +24,7 @@ from src.ui.components import (
     warning_box,
     info_box,
     navigation_buttons,
+    demo_tip,
 )
 
 
@@ -35,6 +36,12 @@ def render_step_cleaning():
         "After testing you can optionally treat data hygiene issues. If you selected "
         "**Label Failure: Mark and Continue** as your failure action, we will provide "
         "the labeled original dataset along with the cleaned dataset for download in your final reports."
+    )
+
+    # Show demo tip if in demo mode
+    demo_tip(
+        "Data treatments clean your data automatically. We've enabled 'Remove punctuation' for the discount column. "
+        "Click 'Run Diagnostics & Treatments' to see the results!"
     )
 
     # Check prerequisites

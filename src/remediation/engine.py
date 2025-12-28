@@ -40,6 +40,9 @@ def run_remediation(
     # Create a copy to avoid modifying the original
     result_df = df.copy()
 
+    # Track which treatments are applied to each column
+    column_treatments: dict[str, list[str]] = {}
+
     # Apply column-level remediations
     for col_config in contract.columns:
         col_name = col_config.name
@@ -50,6 +53,11 @@ def run_remediation(
         for rem in col_config.remediation:
             rem_type = rem.type
             rem_params = rem.params
+
+            # Track the treatment for this column
+            if col_name not in column_treatments:
+                column_treatments[col_name] = []
+            column_treatments[col_name].append(_format_treatment_name(rem_type))
 
             # Check if this is a column or dataframe transformer
             if rem_type in COLUMN_TRANSFORMERS:
@@ -74,8 +82,17 @@ def run_remediation(
                 result_df = deduplicate_rows(result_df, rem.params)
                 break
 
-    # Compute the diff
-    diff = compute_diff(df, result_df)
+    # Compute the diff with generous sample limit
+    # Under 1000 rows: capture all changes
+    # Over 1000 rows: capture up to 1000 per column (report will cap at 100)
+    total_rows = len(df)
+    max_samples = total_rows if total_rows < 1000 else 1000
+    diff = compute_diff(
+        df,
+        result_df,
+        max_samples_per_column=max_samples,
+        column_treatments=column_treatments,
+    )
 
     return result_df, diff
 
@@ -272,3 +289,34 @@ def validate_remediation_config(
                     )
 
     return messages
+
+
+def _format_treatment_name(treatment_type: str) -> str:
+    """
+    Convert a treatment type to a human-readable name.
+
+    Args:
+        treatment_type: The snake_case treatment type (e.g., "trim_whitespace")
+
+    Returns:
+        Human-readable name (e.g., "Trim Whitespace")
+    """
+    # Map of treatment types to friendly names
+    treatment_names = {
+        "trim_whitespace": "Trim Whitespace",
+        "remove_punctuation": "Remove Punctuation",
+        "to_lowercase": "Convert to Lowercase",
+        "to_uppercase": "Convert to Uppercase",
+        "to_titlecase": "Convert to Title Case",
+        "remove_non_printable": "Remove Non-Printable Characters",
+        "standardize_nulls": "Standardize Null Values",
+        "date_coerce": "Standardize Date Format",
+        "numeric_coerce": "Convert to Number",
+        "boolean_coerce": "Standardize Boolean",
+        "categorical_standardize": "Standardize Category Values",
+        "fill_null": "Fill Null Values",
+        "clamp_range": "Clamp to Range",
+        "deduplicate_rows": "Remove Duplicate Rows",
+    }
+
+    return treatment_names.get(treatment_type, treatment_type.replace("_", " ").title())

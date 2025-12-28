@@ -105,6 +105,16 @@ def _render_sidebar():
             unsafe_allow_html=True,
         )
 
+        # Show DEMO MODE badge if in demo mode
+        if st.session_state.get("is_demo_mode"):
+            st.markdown(
+                '<div style="background-color: #F59E0B; color: white; '
+                'padding: 4px 12px; border-radius: 4px; font-size: 0.75rem; '
+                'font-weight: 600; text-align: center; margin-bottom: 0.5rem;">'
+                'DEMO MODE</div>',
+                unsafe_allow_html=True,
+            )
+
         # Clear Session button
         if st.button("🗑️ Clear Session", use_container_width=True, help="Clear all data and start fresh"):
             from src.session import reset_session_state

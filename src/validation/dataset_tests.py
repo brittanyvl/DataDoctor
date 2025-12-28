@@ -316,6 +316,7 @@ def test_cross_field_rule(
         details={
             "rule_name": rule_name,
             "expression": expression,
+            "fields_inspected": all_not_null if all_not_null else [],
             "rows_checked": len(rows_to_check),
             "rows_failed": failed_count,
         },

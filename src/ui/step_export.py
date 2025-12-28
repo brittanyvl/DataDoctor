@@ -12,7 +12,7 @@ import streamlit as st
 
 from src.contract.parser import serialize_contract_to_bytes, serialize_contract_to_yaml
 from src.file_handling.export import export_dataframe
-from src.reporting.html_report import generate_pdf_report
+from src.reporting.html_report import generate_html_report_bytes
 from src.session import set_current_step
 from src.ui.components import (
     step_header,
@@ -20,6 +20,7 @@ from src.ui.components import (
     success_box,
     info_box,
     navigation_buttons,
+    demo_tip,
 )
 from src.validation.engine import add_error_columns
 
@@ -30,6 +31,12 @@ def render_step_export():
         5,
         "Download Data & Diagnostic Reports",
         "Download your cleaned data, reports, and rules.",
+    )
+
+    # Show demo tip if in demo mode
+    demo_tip(
+        "Download the complete package to see all outputs including the PDF report. "
+        "In demo mode, you can start over anytime with 'Clear Session' in the sidebar."
     )
 
     # Check prerequisites
@@ -225,14 +232,14 @@ def _create_export_zip(
                 cleaned_bytes, ext, _ = export_dataframe(remediated_df, output_format=format_ext, escape_formulas=True)
                 zf.writestr(f"{base_name}_cleaned{ext}", cleaned_bytes)
 
-        # PDF Report (includes data cleansing summary if available)
-        report_bytes = generate_pdf_report(
+        # HTML Report (includes data cleansing summary if available)
+        report_bytes = generate_html_report_bytes(
             validation_result,
             original_filename,
             contract.contract_id,
             remediation_diff,
         )
-        zf.writestr(f"{base_name}_report.pdf", report_bytes)
+        zf.writestr(f"{base_name}_report.html", report_bytes)
 
         # Contract YAML
         contract_bytes = serialize_contract_to_bytes(contract)
@@ -296,23 +303,23 @@ def _render_report_export(validation_result, original_filename, contract, base_n
     # Get remediation diff if available
     remediation_diff = st.session_state.get("remediation_diff")
 
-    # Generate PDF report (includes data cleansing summary if available)
-    report_bytes = generate_pdf_report(
+    # Generate HTML report (includes data cleansing summary if available)
+    report_bytes = generate_html_report_bytes(
         validation_result,
         original_filename,
         contract.contract_id,
         remediation_diff,
     )
 
-    report_label = "Data Quality Report (PDF)"
+    report_label = "Data Quality Report (HTML)"
     if remediation_diff and remediation_diff.cells_changed > 0:
-        report_label = "Data Quality Report with Cleansing Summary (PDF)"
+        report_label = "Data Quality Report with Cleansing Summary (HTML)"
 
     st.download_button(
         label=report_label,
         data=report_bytes,
-        file_name=f"{base_name}_report.pdf",
-        mime="application/pdf",
+        file_name=f"{base_name}_report.html",
+        mime="text/html",
         use_container_width=True,
     )
 

@@ -5,6 +5,7 @@ This module implements the file upload step of the Data Doctor workflow,
 including column name configuration and contract upload options.
 """
 
+import os
 import streamlit as st
 import pandas as pd
 import yaml
@@ -43,6 +44,7 @@ from src.ui.components import (
     info_box,
     data_preview,
     navigation_buttons,
+    demo_tip,
 )
 from src.contract.schema import dict_to_contract
 
@@ -98,15 +100,15 @@ def render_step_upload():
 
 
 def _render_start_options():
-    """Render the two starting options: Start Fresh or Use Existing Contract."""
+    """Render the three starting options: Start Fresh, Use Existing Contract, or Try Demo."""
     # Check what mode we're in
     upload_mode = st.session_state.get("upload_mode", None)
 
     if upload_mode is None:
-        # Show the two options
+        # Show the three options
         st.markdown("**How would you like to start?**")
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             st.markdown(
@@ -134,11 +136,27 @@ def _render_start_options():
                 st.session_state["upload_mode"] = "contract"
                 st.rerun()
 
+        with col3:
+            st.markdown(
+                '<div style="background-color: #FEF3C7; padding: 20px; border-radius: 8px; '
+                'border: 2px solid #F59E0B; text-align: center; height: 100%;">'
+                '<p style="font-weight: 600; color: #92400E; margin-bottom: 8px;">Try Demo</p>'
+                '<p style="color: #B45309; font-size: 0.9rem;">Explore with sample data and guided tips</p>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("🎯 Try Demo", use_container_width=True):
+                st.session_state["upload_mode"] = "demo"
+                st.rerun()
+
     elif upload_mode == "fresh":
         _render_fresh_upload()
 
     elif upload_mode == "contract":
         _render_contract_upload()
+
+    elif upload_mode == "demo":
+        _render_demo_mode()
 
 
 def _render_fresh_upload():
@@ -345,6 +363,77 @@ def _process_contract_and_data(contract_file, data_file):
         # 5. Navigate directly to Step 4
         set_current_step(4)
         st.rerun()
+
+
+def _render_demo_mode():
+    """Load demo data and contract, then show Step 1 with demo content."""
+    # Get the path to assets directory
+    assets_dir = os.path.join(os.path.dirname(__file__), "..", "..", "assets")
+    demo_csv_path = os.path.join(assets_dir, "demo_data.csv")
+    demo_contract_path = os.path.join(assets_dir, "demo_contract.yaml")
+
+    # Check if demo files exist
+    if not os.path.exists(demo_csv_path):
+        error_box("Demo data file not found. Please ensure assets/demo_data.csv exists.")
+        if st.button("← Back to options"):
+            st.session_state["upload_mode"] = None
+            st.rerun()
+        return
+
+    if not os.path.exists(demo_contract_path):
+        error_box("Demo contract file not found. Please ensure assets/demo_contract.yaml exists.")
+        if st.button("← Back to options"):
+            st.session_state["upload_mode"] = None
+            st.rerun()
+        return
+
+    # Load demo data
+    try:
+        with st.spinner("Loading demo data..."):
+            # Read the demo CSV
+            df = pd.read_csv(demo_csv_path)
+
+            # Read the demo contract
+            with open(demo_contract_path, "r", encoding="utf-8") as f:
+                contract_data = yaml.safe_load(f)
+
+            contract = dict_to_contract(contract_data)
+
+            # Read file content for hash
+            with open(demo_csv_path, "rb") as f:
+                file_content = f.read()
+
+            file_hash = compute_file_hash(file_content)
+
+            # Store in session state
+            st.session_state["uploaded_file_name"] = "demo_data.csv"
+            st.session_state["file_hash"] = file_hash
+            st.session_state["file_content"] = file_content
+            st.session_state["file_ext"] = ".csv"
+            st.session_state["dataframe"] = df
+            st.session_state["sheet_name"] = None
+            st.session_state["applied_skip_rows"] = 0
+            st.session_state["applied_skip_footer_rows"] = 0
+            st.session_state["column_renames"] = {col: col for col in df.columns}
+            st.session_state["columns_to_ignore"] = set()
+            st.session_state["ignored_columns"] = []
+
+            # Store the contract
+            st.session_state["uploaded_contract"] = contract
+            st.session_state["contract"] = contract
+            st.session_state["contract_source"] = "uploaded"
+
+            # Set demo mode flag
+            st.session_state["is_demo_mode"] = True
+
+            # Navigate to show the loaded data (rerun will show _show_current_file)
+            st.rerun()
+
+    except Exception as e:
+        error_box(f"Error loading demo data: {str(e)}")
+        if st.button("← Back to options"):
+            st.session_state["upload_mode"] = None
+            st.rerun()
 
 
 def _render_contract_summary(contract):
@@ -697,7 +786,7 @@ def _clear_session():
         "remediation_approved", "column_config_version", "applied_quick_actions",
         "apply_changes_message", "pending_file_content", "pending_file_name",
         "pending_file_ext", "pending_file_hash", "available_sheets",
-        "contract_auto_applied",
+        "contract_auto_applied", "is_demo_mode",
     ]
 
     for key in keys_to_clear:
@@ -717,6 +806,12 @@ def _show_current_file():
     df = st.session_state.get("dataframe")
     filename = st.session_state.get("uploaded_file_name", "Unknown")
     sheet_name = st.session_state.get("sheet_name")
+
+    # Show demo tip if in demo mode
+    demo_tip(
+        "This is sample order data with intentional errors. "
+        "Review the preview below, then click 'Order Diagnostics' to see validation rules."
+    )
 
     st.subheader("Loaded Data")
 

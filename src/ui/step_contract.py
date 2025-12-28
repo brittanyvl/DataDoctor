@@ -49,6 +49,8 @@ from src.ui.components import (
     info_box,
     warning_box,
     navigation_buttons,
+    demo_tip,
+    demo_column_explanation,
 )
 
 def render_step_contract():
@@ -56,6 +58,12 @@ def render_step_contract():
     # Custom header without divider
     st.markdown("### Step 2: Order Diagnostics")
     st.markdown("*Define validation tests and data quality rules for each column.*")
+
+    # Show demo tip if in demo mode
+    demo_tip(
+        "We've pre-configured validation rules for this demo. Scroll through each column to see the tests. "
+        "At the bottom, you'll find Cross-Field Validation that checks ship_date is on or after order_date."
+    )
 
     # Check if we have a dataframe
     df = st.session_state.get("dataframe")
@@ -89,33 +97,18 @@ def render_step_contract():
     with col2:
         st.markdown(f"**Ignored Columns:** {len(ignored_columns)}")
 
-    # Inject CSS for larger/bolder tabs
-    st.markdown("""
-    <style>
-        .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    # Column rules section
+    _render_column_rules(contract, df, columns_to_configure)
 
-    # Configuration tabs
-    tab1, tab2 = st.tabs([
-        "Column Rules",
-        "Cross Field Validations",
-    ])
-
-    with tab1:
-        _render_column_rules(contract, df, columns_to_configure)
-
-    with tab2:
-        _render_dataset_tests(contract, df, columns_to_configure)
+    # Cross-field validation at the bottom
+    st.divider()
+    _render_dataset_tests(contract, df, columns_to_configure)
 
     # Navigation
     st.divider()
     back_clicked, next_clicked = navigation_buttons(
         back_label="Back to Upload",
-        next_label="Configure Data Cleaning",
+        next_label="Configure Data Treatments",
     )
 
     if back_clicked:
@@ -221,6 +214,9 @@ def _render_column_preview_table(df, col_name):
 
 def _render_single_column_config(contract, df, col_name, col_config):
     """Render configuration for a single column."""
+    # Show demo explanation if in demo mode
+    demo_column_explanation(col_name)
+
     # Preview table at top of section
     st.markdown(f"##### {col_name} Sample Data")
     _render_column_preview_table(df, col_name)
@@ -370,13 +366,23 @@ def _render_approved_values_dropdown(col_config, col_name, existing_tests):
     # Get current selection if exists
     existing = next((t for t in col_config.tests if t.type == "enum"), None)
     current_idx = 0
-    if existing and existing.params.get("preset"):
-        # Find matching preset
+    existing_custom_values = []
+    existing_case_insensitive = True
+
+    if existing:
+        # Check if it's a preset or custom list
         preset_key = existing.params.get("preset")
-        for i, opt in enumerate(preset_options):
-            if get_enum_key_from_display(opt) == preset_key:
-                current_idx = i + 1  # +1 because Custom is first
-                break
+        if preset_key:
+            # Find matching preset
+            for i, opt in enumerate(preset_options):
+                if get_enum_key_from_display(opt) == preset_key:
+                    current_idx = i + 1  # +1 because Custom is first
+                    break
+        else:
+            # It's a custom list - stays at index 0
+            existing_custom_values = existing.params.get("allowed_values", [])
+
+        existing_case_insensitive = existing.params.get("case_insensitive", True)
 
     selected = st.selectbox(
         "Select approved values source",
@@ -388,8 +394,11 @@ def _render_approved_values_dropdown(col_config, col_name, existing_tests):
     params = {}
 
     if selected == "Custom list (enter values below)":
+        # Pre-populate with existing values if available
+        default_values = "\n".join(existing_custom_values) if existing_custom_values else ""
         values_str = st.text_area(
             "Enter allowed values (one per line)",
+            value=default_values,
             key=f"enum_vals_{col_name}",
             height=100,
         )
@@ -401,7 +410,7 @@ def _render_approved_values_dropdown(col_config, col_name, existing_tests):
 
     params["case_insensitive"] = st.checkbox(
         "Ignore case when matching",
-        value=True,
+        value=existing_case_insensitive,
         key=f"enum_case_{col_name}",
     )
 
@@ -838,6 +847,18 @@ def _render_cross_field_rules(contract, df, columns_to_configure):
     st.markdown("## Cross-Field Validation")
     st.markdown("Create rules that validate relationships between columns.")
     st.caption("Example: Ensure end_date is after start_date, or total equals quantity × price.")
+
+    # Show demo tip for cross-field validation
+    if st.session_state.get("is_demo_mode"):
+        st.markdown(
+            '<div style="background-color: #EBF8FF; border-left: 4px solid #3182CE; '
+            'padding: 12px 16px; margin: 8px 0 16px 0; border-radius: 4px;">'
+            '<span style="color: #2C5282; font-weight: 600;">Why this rule?</span> '
+            '<span style="color: #2A4365;">The <strong>ship_date >= order_date</strong> rule ensures orders aren\'t marked as shipped before they were placed. '
+            'This catches data entry errors where dates are swapped or typos occur. Rows failing this check are labeled for review.</span>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
     # Show existing cross-field rules
     xf_rules = [t for t in contract.dataset_tests if t.type == "cross_field_rule"]

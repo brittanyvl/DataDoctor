@@ -1,0 +1,501 @@
+order_id,customer_name,email,phone,quantity,unit_price,discount_pct,order_date,ship_date,is_priority,status,state_code
+1,Linda Smith,lsmith@gmail.com,9587582424,5,24.6,6%,2024-04-29,2024-05-08,Y,cancelled,IL
+2,Paul Wilson,pwilson@yahoo.com,632-548-5552,28,479.03,10%,2024-02-22,2024-02-24,N,pending,MN
+3,Daniel Martin,daniel.martin@gmail.com,+1 587-280-5803,74,104.22,2%,2024-01-24,2024-02-04,Y,shipped,CO
+4,Joseph Ramirez  ,joseph82@outlook.com,(563) 414-5374,78,321.14,17%,2024-05-05,2024-05-08,N,delivered,LA
+5,Emily Davis,emily30@gmail.com,+1 474-267-4456,28,331.16,12%,2024-11-25,2024-12-03,Y,shipped,FL
+6,Jessica White,jwhite@company.com,608-570-4593,66,251.82,24%,2024-01-25,2024-02-08,Y,processing,SD
+7,David Sanchez,dsanchez@company.com,(679) 741-5119,88,363.15,21%,2024-10-01,2024-10-14,N,shipped,DE
+8,  Charles Wilson,charles.wilson@outlook.com,840-505-9317,20,193.22,5%,2024-10-03,2024-10-16,Y,cancelled,MA
+9,Ashley Smith  ,asmith@yahoo.com,(280) 287-8962,98,271.03,4%,2024-03-06,2024-03-17,N,cancelled,HI
+36,Thomas Taylor,ttaylor@yahoo.com,5196087118,67,231.23,7%,2024-04-25,2024-04-27,N,pending,PA
+27,Joseph Jackson,joseph.jackson@gmail.com,232-538-2160,36,337.8,6%,2024-10-03,2024-10-06,N,processing,NM
+29,Richard Brown  ,rbrown@company.com,(255) 889-2612,52,366.82,25%,2024-02-25,2024-02-29,Y,processing,OH
+14,William Wilson  ,william.wilson@yahoo.com,(251) 867-9856,12,463.92,27%,2024-05-01,2024-05-04,N,delivered,NM
+4,Betty Lewis  ,betty50@outlook.com,633-913-8973,25,155.39,30%,2024-01-30,2024-02-09,Y,shipped,AR
+27,Donna Thomas,donna.thomas@email.org,390-270-2113,52,68.74,28%,2024-10-18,2024-10-22,Y,cancelled,CO
+7,Donna Jackson,donna27@outlook.com,6053345915,41,465.22,29%,2024-02-07,2024-02-08,N,cancelled,OR
+43,Robert Moore,robert.moore@outlook.com,5784913584,70,354.73,19%,2024-11-30,2024-12-09,Y,cancelled,MD
+6,Michael Walker,michael.walker@outlook.com,+1 478-488-4450,27,346.87,27%,2024-05-15,2024-05-24,N,shipped,AR
+36,Margaret Clark,margaret.clark@gmail.com,(959) 652-8007,15,46.87,28%,2024-12-19,2024-12-22,Y,shipped,PA
+12,Elizabeth Wilson  ,ewilson@yahoo.com,+1 455-882-2684,100,284.34,27%,2024-07-27,2024-08-06,Y,processing,HI
+21,Anthony Smith  ,anthony.smith@company.com,(918) 310-7267,61,118.99,26%,2024-08-23,2024-08-29,N,processing,IA
+22,Mary Perez  ,mperez@outlook.com,+1 721-609-9785,4,66.52,8%,2024-04-01,2024-04-11,N,pending,CT
+23,Joshua Wilson,joshua.wilson@outlook.com,+1 594-790-4114,6,357.3,0%,2024-09-23,2024-10-06,Y,shipped,NV
+24,Robert Walker,rwalker@gmail.com,5077196067,42,207.18,9%,2024-10-10,2024-10-13,Y,delivered,TX
+25,,matthew79@email.org,+1 761-200-5978,27,220.65,18%,2024-11-06,2024-11-17,N,delivered,NH
+26,,mark95@yahoo.com,(727) 879-6491,97,125.09,9%,2024-04-25,2024-05-08,Y,processing,AK
+27,,john99@gmail.com,8447894185,64,205.83,4%,2024-12-01,2024-12-13,Y,pending,WY
+28,,margaret.davis@email.org,3246673184,86,270.25,17%,2024-10-31,2024-11-06,N,cancelled,WA
+29,,steven58@yahoo.com,+1 465-969-5050,99,391.06,15%,2024-11-16,2024-11-20,N,delivered,CA
+30,,charles.davis@outlook.com,436-592-3503,9,213.29,10%,2024-10-04,2024-10-12,N,pending,IN
+31,,anthony90@gmail.com,+1 688-206-6763,97,201.09,28%,2024-08-02,2024-08-11,Y,delivered,IA
+32,,sarah44@company.com,(330) 837-9751,51,300.03,21%,2024-01-14,2024-01-16,N,processing,NJ
+33,,barbara28@company.com,9795885558,33,419.11,15%,2024-01-10,2024-01-22,Y,shipped,IA
+34,,robert.harris@gmail.com,220-836-3496,17,242.04,3%,2024-10-15,2024-10-19,N,shipped,WY
+35,,ngarcia@gmail.com,2265197149,92,107.18,18%,2024-12-19,2025-01-02,Y,pending,VT
+36,,kramirez@outlook.com,(638) 877-7071,65,327.3,0%,2024-08-03,2024-08-17,N,pending,NV
+37,,nancy.lee@company.com,9517345425,60,223.43,23%,2024-10-30,2024-11-04,N,processing,CO
+38,,sarah73@email.org,229-706-6325,63,113.94,25%,2024-05-12,2024-05-18,N,cancelled,VT
+39,,smoore@company.com,9764468800,58,398.54,2%,2024-05-30,2024-06-03,N,processing,MD
+40,,donna45@company.com,+1 560-919-8434,40,133.19,3%,2024-04-08,2024-04-14,Y,cancelled,WI
+41,Barbara Miller,bmiller@email.org,+1 489-302-4180,30,186.83,9%,2024-01-08,2024-01-20,Y,shipped,AZ
+42,Patricia Moore,patricia.moore@yahoo.com,7874918690,57,176.95,30%,2024-01-27,2024-02-01,N,pending,CA
+43,  Betty Thomas  ,betty20@yahoo.com,2874542940,78,302.1,19%,2024-04-25,2024-05-08,N,delivered,NH
+44,Karen Ramirez,karen.ramirez@company.com,824-957-2625,81,113.4,21%,2024-02-11,2024-02-14,Y,processing,OK
+45,Robert Garcia  ,robert.garcia@email.org,4959235632,10,346.82,29%,2024-05-15,2024-05-28,Y,delivered,DE
+46,Paul Davis,paul.davis@outlook.com,5148095728,16,239.66,9%,2024-12-24,2024-12-31,N,cancelled,OH
+47,  Ashley Anderson,ashley95@outlook.com,(226) 293-4750,98,339.42,8%,2024-10-22,2024-10-23,Y,delivered,ND
+48,Mark Robinson,mark56@company.com,+1 556-618-6460,86,61.25,5%,2024-06-17,2024-06-24,N,shipped,TX
+49,Betty Clark,betty59@gmail.com,(531) 318-7622,85,435.99,14%,2024-07-30,2024-07-31,Y,cancelled,MS
+50,Michelle Harris,double@@at.com,7623345719,90,247.51,0%,2024-11-18,2024-11-28,Y,processing,MD
+51,James Moore,double@@at.com,+1 357-710-5781,54,419.01,15%,2024-05-04,2024-05-12,Y,delivered,IL
+52,Steven White,spaces in@email.com,+1 473-202-5634,76,294.16,21%,2024-09-07,2024-09-21,Y,delivered,OH
+53,Daniel Hernandez,,914-444-7274,100,211.28,10%,2024-08-30,2024-09-11,N,delivered,TX
+54,Elizabeth Thomas,@nodomain.com,6503029617,2,364.0,13%,2024-12-01,2024-12-04,Y,delivered,KY
+55,Michelle Thompson,notanemail,(841) 935-8994,80,43.53,20%,2024-12-16,2024-12-21,Y,pending,NV
+56,Michael Anderson  ,notanemail,567-583-8056,32,270.27,18%,2024-12-15,2024-12-28,Y,processing,ID
+57,Michelle Ramirez,@nodomain.com,6728535161,33,336.75,28%,2024-08-26,2024-08-31,Y,pending,NH
+58,Donna Martinez,spaces in@email.com,(403) 593-8916,31,196.87,11%,2024-10-21,2024-10-26,N,pending,TX
+59,Sarah Smith,no.atsign.com,821-560-4588,80,132.81,24%,2024-12-03,2024-12-14,Y,pending,SD
+60,John Martinez,,502-534-7807,26,74.76,17%,2024-07-06,2024-07-15,N,processing,KY
+61,Donald Walker,no.atsign.com,+1 972-431-7511,12,397.43,0%,2024-05-15,2024-05-24,Y,delivered,MS
+62,Thomas Jackson,missing@domain,834-774-6374,83,40.98,26%,2024-08-25,2024-09-06,N,delivered,DE
+63,John Walker  ,spaces in@email.com,5976647078,76,373.71,4%,2024-07-31,2024-08-11,Y,delivered,SC
+64,Sarah Johnson,missing@domain,+1 301-902-7018,8,205.09,6%,2024-03-03,2024-03-17,N,pending,TX
+65,Joshua Smith  ,double@@at.com,983-767-4394,30,170.99,4%,2024-11-01,2024-11-02,N,processing,FL
+66,  Thomas Sanchez  ,spaces in@email.com,802-531-1258,34,35.68,23%,2024-08-03,2024-08-12,Y,pending,NM
+67,Nancy Taylor,notanemail,+1 944-874-9543,59,325.24,0%,2024-02-01,2024-02-09,N,delivered,UT
+68,Ashley Thompson,notanemail,+1 267-329-5505,49,497.37,16%,2024-05-30,2024-06-07,N,pending,VT
+69,Emily White,notanemail,(664) 608-7815,41,219.11,21%,2024-05-10,2024-05-16,Y,delivered,CA
+70,Jennifer Williams,@nodomain.com,(775) 775-6400,53,183.26,21%,2024-08-04,2024-08-18,Y,shipped,RI
+71,Daniel Brown,,(558) 769-7022,98,146.5,7%,2024-08-07,2024-08-21,Y,cancelled,TX
+72,  Sarah Smith  ,spaces in@email.com,(346) 779-7566,19,373.07,0%,2024-02-16,2024-02-28,Y,delivered,NE
+73,Lisa Garcia,missing@domain,(359) 361-1815,35,227.13,13%,2024-09-05,2024-09-15,N,delivered,LA
+74,Steven Brown,missing@domain,883-515-1744,51,492.38,1%,2024-01-04,2024-01-08,N,processing,WY
+75,Thomas Martinez,,+1 589-745-4770,10,204.56,23%,2024-01-22,2024-01-29,Y,delivered,CA
+76,Christopher Jackson,christopher.jackson@company.com,614-221-6321,80,235.45,22%,2024-07-04,2024-07-06,N,pending,KS
+77,Margaret Jackson,margaret.jackson@gmail.com,(541) 997-3754,66,320.28,16%,2024-09-18,2024-09-22,N,shipped,WA
+78,Elizabeth Davis  ,edavis@yahoo.com,2773819095,97,286.23,18%,2024-08-17,2024-08-28,N,shipped,GA
+79,Mark Williams,mark36@email.org,7192756085,58,28.43,11%,2024-05-26,2024-05-28,Y,cancelled,RI
+80,Steven Gonzalez,sgonzalez@company.com,abc-def-ghij,65,83.92,1%,2024-08-18,2024-08-20,N,pending,NC
+81,Barbara Johnson,bjohnson@email.org,123-456,50,210.3,10%,2024-12-13,2024-12-23,Y,shipped,CA
+82,Michael Moore,michael33@email.org,123,40,484.17,22%,2024-12-05,2024-12-12,Y,cancelled,VA
+83,Karen Moore,kmoore@gmail.com,not-a-phone,3,187.67,5%,2024-04-19,2024-04-25,N,processing,IA
+84,Elizabeth Williams,elizabeth.williams@gmail.com,12345678901234,20,89.5,26%,2024-12-20,2025-01-02,Y,delivered,AZ
+85,Nancy Perez,nancy.perez@company.com,12345678901234,25,190.24,30%,2024-10-19,2024-10-27,N,shipped,WY
+86,Steven Taylor,steven26@email.org,not-a-phone,71,467.8,22%,2024-09-21,2024-10-05,Y,shipped,CO
+87,Sarah Anderson,sarah56@gmail.com,123-456,51,255.98,7%,2024-07-16,2024-07-18,N,processing,AK
+88,Michael Clark,michael19@yahoo.com,(000) 000-0000,58,311.52,28%,2024-02-10,2024-02-11,N,processing,GA
+89,Joshua Taylor,joshua.taylor@outlook.com,not-a-phone,15,419.98,15%,2024-11-01,2024-11-10,Y,cancelled,OR
+90,Elizabeth Martinez,elizabeth46@yahoo.com,123,9,477.17,17%,2024-09-16,2024-09-29,Y,delivered,NM
+91,Matthew Lopez,matthew.lopez@gmail.com,12345678901234,18,31.72,17%,2024-06-22,2024-07-06,Y,delivered,VT
+92,  Barbara Sanchez  ,barbara.sanchez@company.com,abc-def-ghij,66,205.13,26%,2024-10-05,2024-10-13,N,pending,WI
+93,Richard Martinez,richard.martinez@gmail.com,123-456,50,176.13,5%,2024-09-11,2024-09-23,N,shipped,ND
+94,Jennifer White,jennifer78@yahoo.com,12345678901234,85,154.86,14%,2024-11-04,2024-11-16,N,processing,VT
+95,Daniel Anderson  ,daniel.anderson@email.org,12345678901234,66,402.54,21%,2024-03-22,2024-03-23,Y,cancelled,UT
+96,  John Jones  ,john.jones@outlook.com,abc-def-ghij,48,227.53,2%,2024-10-20,2024-10-23,N,delivered,MA
+97,Sarah Davis,sdavis@company.com,123,100,137.54,14%,2024-04-19,2024-04-29,N,delivered,IL
+98,  William Ramirez,wramirez@outlook.com,not-a-phone,39,427.17,22%,2024-12-29,2025-01-10,Y,shipped,NC
+99,Linda Miller,lmiller@outlook.com,12345678901234,79,443.28,2%,2024-06-07,2024-06-14,N,cancelled,NE
+100,Andrew Williams  ,andrew58@company.com,123-456,56,256.4,27%,2024-01-29,2024-02-12,Y,cancelled,GA
+101,David Garcia,david.garcia@yahoo.com,456-401-5496,81,158.38,17%,2024-02-17,2024-02-26,Y,cancelled,PA
+102,Elizabeth Garcia,elizabeth.garcia@email.org,283-246-5336,99,290.35,19%,2024-11-23,2024-11-24,N,cancelled,ME
+103,Karen Thomas,kthomas@gmail.com,2613618202,62,237.58,10%,2024-11-06,2024-11-09,N,shipped,WA
+104,Daniel Gonzalez  ,daniel.gonzalez@email.org,6773255382,32,79.03,1%,2024-05-28,2024-06-04,N,processing,HI
+105,Christopher Robinson,crobinson@company.com,6787106055,3,54.12,12%,2024-09-15,2024-09-23,Y,processing,PA
+106,Daniel Johnson  ,djohnson@outlook.com,208-310-8060,34,366.48,24%,2024-07-25,2024-07-31,Y,delivered,AR
+107,  Andrew Moore  ,andrew10@company.com,(982) 763-5582,17,487.79,12%,2024-07-10,2024-07-23,N,cancelled,MS
+108,Elizabeth Miller,elizabeth.miller@company.com,3409306456,67,233.92,19%,2024-09-20,2024-09-23,N,cancelled,MA
+109,David Gonzalez,dgonzalez@email.org,7457015911,3,190.5,21%,2024-02-26,2024-03-04,N,pending,RI
+110,Donald Rodriguez,drodriguez@gmail.com,6913749589,2000,412.61,7%,2024-01-17,2024-01-27,Y,processing,AK
+111,  Christopher Wilson  ,christopher53@email.org,953-944-2020,2000,111.6,10%,2024-12-05,2024-12-13,N,shipped,ID
+112,Paul Hernandez,paul.hernandez@outlook.com,485-771-5890,1500,387.88,22%,2024-04-16,2024-04-28,N,shipped,NM
+113,Emily Robinson,erobinson@email.org,+1 756-588-7464,1500,404.26,9%,2024-01-22,2024-01-27,Y,shipped,NH
+114,Donald Miller,donald.miller@email.org,311-830-4920,2000,338.22,16%,2024-04-25,2024-05-06,Y,pending,CT
+115,Lisa Thompson,lisa1@email.org,868-687-8822,0,482.32,10%,2024-05-26,2024-06-06,Y,pending,TN
+116,Paul White,paul.white@gmail.com,+1 606-707-4052,2000,14.54,18%,2024-11-04,2024-11-06,N,shipped,NJ
+117,William Ramirez,william.ramirez@outlook.com,948-669-5215,2000,370.94,25%,2024-05-31,2024-06-10,Y,processing,SC
+118,Margaret Taylor,margaret.taylor@company.com,(688) 531-5064,-5,197.95,14%,2024-05-16,2024-05-22,N,cancelled,WA
+119,Thomas Lee,thomas8@gmail.com,+1 363-615-9233,2000,67.53,29%,2024-05-31,2024-06-06,Y,processing,FL
+120,Elizabeth Anderson,elizabeth48@company.com,975-750-4578,1500,379.82,27%,2024-02-11,2024-02-20,N,cancelled,VA
+121,Robert Robinson,rrobinson@yahoo.com,+1 749-353-3695,2000,226.5,21%,2024-04-15,2024-04-27,N,pending,NC
+122,Patricia Anderson  ,patricia73@gmail.com,8885151356,1500,410.06,23%,2024-04-21,2024-05-01,Y,pending,NV
+123,Robert Moore,robert61@gmail.com,3849873218,0,496.5,12%,2024-08-17,2024-08-31,N,delivered,CO
+124,  Daniel Brown  ,daniel.brown@company.com,9742235888,1500,362.36,13%,2024-09-29,2024-10-06,Y,processing,NJ
+125,  Elizabeth Rodriguez  ,elizabeth.rodriguez@gmail.com,(446) 411-2102,-5,26.45,19%,2024-12-10,2024-12-22,Y,processing,WV
+126,Betty Anderson,banderson@yahoo.com,+1 496-439-6224,31,157.86,4%,2024-12-04,2024-12-13,Y,delivered,MD
+127,Sarah Johnson,sjohnson@company.com,7072486642,68,166.18,13%,2024-07-28,2024-07-31,N,delivered,ID
+128,Paul Thomas,paul.thomas@yahoo.com,775-622-7824,50,129.0,6%,2024-06-18,2024-06-29,Y,delivered,MS
+129,Jennifer Moore,jmoore@company.com,(819) 817-1647,25,404.28,18%,2024-12-09,2024-12-18,Y,delivered,IN
+130,Lisa Martinez,lmartinez@gmail.com,972-690-4974,51,-47.17,17%,2024-06-13,2024-06-26,N,delivered,NJ
+131,Daniel Martinez,dmartinez@gmail.com,680-979-6246,48,-74.18,1%,2024-10-15,2024-10-29,Y,processing,AK
+132,Donna Jackson,donna.jackson@outlook.com,5887835026,71,-83.34,21%,2024-06-21,2024-06-26,N,delivered,NJ
+133,  Daniel Garcia  ,dgarcia@gmail.com,(234) 276-1794,53,-49.93,20%,2024-04-28,2024-04-30,Y,pending,IN
+134,Nancy Johnson,nancy.johnson@email.org,(744) 764-7739,3,-33.27,8%,2024-10-01,2024-10-06,Y,cancelled,VT
+135,Barbara Brown,bbrown@yahoo.com,+1 739-458-6807,51,-32.28,30%,2024-07-26,2024-08-03,Y,processing,MD
+136,Jennifer Lee,jennifer12@company.com,(765) 687-1919,90,-11.42,15%,2024-08-10,2024-08-21,N,cancelled,CT
+137,John Davis,john.davis@email.org,(900) 487-9897,23,-70.37,10%,2024-01-09,2024-01-13,Y,delivered,CA
+138,Andrew Davis,andrew87@email.org,(973) 957-3292,65,-66.28,11%,2024-01-28,2024-01-30,N,processing,CA
+139,Michelle Walker,michelle4@outlook.com,4335647150,24,-92.72,21%,2024-07-13,2024-07-15,N,processing,VA
+140,Sarah Jones,sarah95@company.com,+1 309-293-1085,57,-55.56,8%,2024-02-22,2024-02-25,Y,processing,NV
+141,Emily Taylor,emily.taylor@gmail.com,8118126315,2,153.01,12%,2024-02-13,2024-02-25,Y,cancelled,ND
+142,David Perez,david35@outlook.com,3492643739,36,216.34,15%,2024-02-09,2024-02-15,N,processing,WA
+143,Ashley Martin,ashley.martin@company.com,+1 605-540-7224,57,174.02,26%,2024-11-29,2024-12-09,Y,shipped,MA
+144,Joshua Walker,joshua41@yahoo.com,498-952-9044,42,194.27,26%,2024-07-20,2024-07-26,Y,cancelled,IL
+145,  Donna Moore  ,donna94@company.com,4989092133,87,254.66,20%,2024-06-04,2024-06-08,N,processing,VA
+146,Margaret Sanchez,margaret77@company.com,(747) 718-7853,47,353.8,25%,2024-10-01,2024-10-11,Y,pending,WY
+147,Jessica Perez,jperez@gmail.com,+1 860-893-7547,56,61.91,3%,2024-05-12,2024-05-16,Y,delivered,MS
+148,Betty Anderson,betty89@email.org,+1 225-694-2712,54,461.07,2%,2024-02-29,2024-03-14,Y,shipped,MD
+149,Lisa Anderson,lisa.anderson@email.org,+1 648-939-8412,9,157.13,25%,2024-12-29,2024-12-31,Y,shipped,TN
+150,Michael Perez,michael.perez@yahoo.com,5387737985,30,400.9,20%,2024-12-10,2024-12-06,N,delivered,AK
+151,Mark Jackson,mark91@yahoo.com,(970) 920-2025,69,101.61,10%,2024-10-07,2024-09-28,Y,shipped,TX
+152,Christopher Martin,christopher76@gmail.com,+1 668-832-3826,79,299.18,21%,2024-03-30,2024-03-27,Y,processing,MD
+153,Nancy Thompson  ,nancy77@yahoo.com,633-390-8973,72,91.76,9%,2024-02-27,2024-02-21,N,delivered,SC
+154,James Thomas  ,jthomas@company.com,7036258272,22,50.51,0%,2024-11-01,2024-10-27,Y,shipped,IA
+155,David Harris,dharris@gmail.com,+1 316-474-9898,70,413.08,1%,2024-12-30,2024-12-26,Y,delivered,CT
+156,Karen Ramirez,karen34@outlook.com,320-994-4882,95,298.08,11%,2024-04-11,2024-04-07,N,processing,SC
+157,Susan Sanchez  ,susan.sanchez@email.org,+1 531-920-5794,74,141.0,27%,2024-08-28,2024-08-27,Y,processing,WI
+158,Sarah Ramirez,sarah.ramirez@yahoo.com,9798927434,19,292.94,8%,2024-12-20,2024-12-18,N,delivered,CA
+159,Betty Taylor,btaylor@outlook.com,2029922526,82,335.43,11%,2024-05-18,2024-05-10,N,processing,NV
+160,Sarah Hernandez,shernandez@yahoo.com,(696) 551-1793,13,316.83,26%,2024-09-20,2024-09-19,Y,processing,NH
+161,Margaret Miller,margaret84@outlook.com,+1 295-870-6905,11,192.2,28%,2024-07-05,2024-07-01,Y,delivered,SD
+162,  Margaret Lee,margaret.lee@gmail.com,8074319510,2,13.95,10%,2024-03-07,2024-03-03,N,processing,NM
+163,Matthew Williams,matthew14@outlook.com,340-591-3181,9,269.95,0%,2024-05-19,2024-05-16,Y,delivered,MN
+164,Anthony Martin,anthony.martin@yahoo.com,+1 803-947-7291,55,164.11,4%,2024-12-03,2024-11-23,Y,processing,OK
+165,Joshua Martinez,jmartinez@yahoo.com,8217214090,38,326.62,25%,2024-10-12,2024-10-02,N,pending,KS
+166,Robert Taylor,robert47@outlook.com,782-630-6986,98,240.8,24%,2024-05-20,2024-05-19,Y,pending,KY
+167,Patricia Walker,patricia37@email.org,918-611-2350,36,50.96,2%,2024-08-18,2024-08-08,Y,cancelled,MA
+168,Robert Martinez,robert8@yahoo.com,+1 318-664-1901,86,373.43,23%,2024-02-05,2024-02-02,Y,processing,VT
+169,Ashley Walker,ashley93@outlook.com,(329) 967-5403,99,450.95,10%,2024-11-21,2024-11-19,Y,shipped,VA
+170,Ashley Anderson,ashley64@email.org,(361) 461-2685,30,372.98,0%,2024-09-28,2024-09-22,Y,processing,AZ
+171,  Matthew Robinson,matthew92@company.com,+1 454-626-6241,10,290.05,3%,2024-09-14,2024-09-25,Y,processing,IA
+172,Kimberly Johnson,kimberly60@outlook.com,(288) 766-8483,48,108.33,18%,2024-06-04,2024-06-16,Y,delivered,MS
+173,Donna Thomas,donna.thomas@yahoo.com,206-619-1391,70,179.75,26%,2024-12-21,2024-12-22,N,pending,WI
+174,Matthew Ramirez,matthew.ramirez@outlook.com,629-703-1981,92,147.11,1%,2024-04-28,2024-05-12,N,shipped,NJ
+175,  Jennifer Jackson,jennifer.jackson@company.com,645-878-3141,38,137.89,10%,2024-07-20,2024-08-01,N,shipped,NH
+176,  Sarah Davis,sarah.davis@yahoo.com,3083688365,41,209.19,17%,2024-07-02,2024-07-15,Y,delivered,MD
+177,Sandra Rodriguez,sandra.rodriguez@gmail.com,(420) 535-3430,92,131.63,11%,2024-07-21,2024-07-30,Y,shipped,KY
+178,Barbara Smith,barbara.smith@company.com,(673) 304-3290,2,40.22,24%,2024-04-23,2024-04-26,Y,delivered,MS
+179,Jennifer Jackson,jjackson@yahoo.com,+1 654-331-2506,16,30.92,14%,2024-01-26,2024-01-29,N,delivered,NY
+180,Mary Gonzalez,mary46@yahoo.com,(486) 656-3435,79,313.4,7%,2024-11-27,01/15/2024,N,delivered,OK
+181,  Sarah Gonzalez,sarah32@email.org,9305678859,45,457.21,16%,2024-06-13,15-01-2024,N,processing,AK
+182,Mary Lewis,mary8@company.com,985-798-4813,13,131.45,7%,"Jan 15, 2024",2024-05-25,Y,processing,OR
+183,Daniel Robinson,daniel23@yahoo.com,(955) 914-6878,91,353.27,30%,"Jan 15, 2024",2024-10-27,Y,cancelled,IL
+184,  Paul Martinez,paul.martinez@gmail.com,(220) 739-8831,43,459.77,6%,2024-03-07,not-a-date,Y,shipped,AR
+185,  Elizabeth Harris  ,eharris@company.com,+1 303-544-5944,18,488.17,23%,not-a-date,2024-08-24,N,shipped,ID
+186,Michelle Sanchez,msanchez@outlook.com,905-501-3086,94,10.88,22%,2024-10-20,not-a-date,Y,processing,RI
+187,Joseph Lee,joseph.lee@company.com,(555) 527-3750,91,338.31,23%,2024-06-20,01/15/2024,Y,shipped,IN
+188,Daniel Rodriguez,drodriguez@company.com,6293707783,49,182.1,12%,15-01-2024,2024-03-06,N,cancelled,TN
+189,  David Anderson,david.anderson@outlook.com,2755503787,21,368.67,17%,15-01-2024,2024-02-23,N,pending,NV
+190,Joshua Lewis,joshua.lewis@gmail.com,+1 619-913-9849,85,147.95,7%,15-01-2024,2024-02-20,N,cancelled,OK
+191,  Patricia Lopez,patricia.lopez@outlook.com,299-226-4390,82,152.99,2%,2024-08-30,2024-09-13,Y,shipped,MT
+192,Donald Thomas,donald.thomas@outlook.com,579-590-7052,58,31.86,14%,2024-08-26,2024-08-31,Y,shipped,OR
+193,Patricia Jones,patricia11@outlook.com,(974) 803-4727,50,411.02,13%,2024-10-01,2024-10-12,N,cancelled,KS
+194,  Donald Martinez  ,dmartinez@email.org,(893) 835-3415,97,230.03,30%,2024-03-26,2024-03-30,Y,processing,AZ
+195,Margaret Williams,margaret26@yahoo.com,(527) 944-2097,50,282.62,17%,2024-06-15,2024-06-29,N,cancelled,NJ
+196,James Sanchez,james67@company.com,(353) 351-2641,73,391.98,25%,2024-05-26,2024-06-09,N,delivered,KY
+197,Matthew Lee,matthew61@gmail.com,(612) 347-7581,51,445.89,10%,2024-12-19,2024-12-23,Y,delivered,LA
+198,Nancy Smith,nsmith@company.com,901-300-4734,39,487.37,14%,2024-06-13,2024-06-18,N,cancelled,TN
+199,Jennifer Miller,jennifer95@company.com,(257) 727-3604,40,357.69,12%,2024-03-10,2024-03-23,Y,processing,IL
+200,  Richard Clark,richard7@outlook.com,5776759275,82,462.31,21%,2024-01-16,2024-01-20,0,delivered,RI
+201,Barbara Walker,barbara.walker@email.org,+1 464-966-2480,4,199.42,5%,2024-10-19,2024-11-01,False,processing,TN
+202,Susan Rodriguez,susan.rodriguez@email.org,862-377-1138,33,308.09,30%,2024-06-05,2024-06-17,no,delivered,MO
+203,Sandra Rodriguez,sandra87@email.org,+1 798-304-1120,72,327.2,19%,2024-05-24,2024-05-29,no,delivered,CA
+204,Sarah Lee,sarah.lee@outlook.com,(729) 983-4937,77,208.01,10%,2024-12-14,2024-12-17,yes,delivered,ME
+205,Anthony Gonzalez,anthony75@email.org,9439304643,86,185.66,9%,2024-03-28,2024-04-11,0,shipped,CT
+206,William White,wwhite@outlook.com,291-427-6820,96,437.0,13%,2024-06-18,2024-06-24,0,cancelled,ME
+207,  Linda Thomas  ,linda75@email.org,3997122963,68,156.19,1%,2024-03-18,2024-03-21,0,shipped,NE
+208,Elizabeth Hernandez,ehernandez@outlook.com,(381) 520-1950,58,144.03,24%,2024-03-27,2024-04-06,false,delivered,WI
+209,William Martin,william52@company.com,204-238-9745,94,192.82,0%,2024-06-13,2024-06-26,true,pending,UT
+210,Jessica Davis,jessica40@yahoo.com,715-802-6015,9,413.68,9%,2024-05-28,2024-06-05,True,delivered,UT
+211,Lisa Lewis,lisa.lewis@yahoo.com,429-944-3149,94,20.74,16%,2024-03-27,2024-03-29,yes,pending,MO
+212,  Paul Martin,pmartin@gmail.com,3186268279,16,278.17,15%,2024-12-25,2024-12-28,1,pending,MD
+213,Michael Perez,michael.perez@email.org,+1 723-936-2928,15,394.53,15%,2024-04-11,2024-04-21,False,shipped,ND
+214,Daniel Thompson,daniel.thompson@yahoo.com,904-692-6416,1,16.25,2%,2024-02-26,2024-03-11,false,processing,CO
+215,Michael Lewis,michael59@outlook.com,(251) 302-3862,38,186.51,21%,2024-06-09,2024-06-16,true,pending,WI
+216,  James Ramirez  ,jramirez@company.com,+1 474-950-2522,44,99.61,12%,2024-07-23,2024-07-31,0,delivered,VT
+217,Anthony Lee,anthony.lee@yahoo.com,3066268908,24,309.55,24%,2024-07-02,2024-07-12,0,processing,NM
+218,Linda Lewis,linda.lewis@gmail.com,921-894-9598,86,437.84,16%,2024-09-24,2024-10-06,False,delivered,TX
+219,Donald Lopez,donald.lopez@company.com,2118583571,64,436.01,2%,2024-09-08,2024-09-14,true,shipped,LA
+220,Steven Davis,steven52@yahoo.com,(654) 786-8341,64,229.06,3%,2024-09-11,2024-09-23,1,pending,MT
+221,John Moore,jmoore@outlook.com,+1 775-411-8474,47,414.4,26%,2024-04-24,2024-05-08,N,shipped,OK
+222,Michelle Martin,michelle.martin@outlook.com,(977) 874-4633,44,184.02,20%,2024-05-29,2024-06-07,N,pending,AZ
+223,  David Thomas  ,david.thomas@company.com,392-323-7437,59,414.03,6%,2024-06-22,2024-06-24,N,pending,SD
+224,Donna Brown,donna.brown@company.com,(710) 204-9689,71,468.3,26%,2024-10-26,2024-11-03,Y,cancelled,ID
+225,William Brown,william78@outlook.com,+1 628-823-5067,51,482.16,9%,2024-08-19,2024-09-01,Y,processing,NE
+226,Joshua Thompson,jthompson@outlook.com,954-766-4560,27,315.84,9%,2024-12-17,2024-12-23,Y,processing,NC
+227,Paul Thompson,paul98@outlook.com,+1 796-784-7839,55,406.07,16%,2024-02-24,2024-02-25,N,processing,AR
+228,Patricia Miller,patricia.miller@yahoo.com,(907) 502-4342,46,408.87,3%,2024-11-11,2024-11-25,Y,cancelled,MO
+229,Jessica Taylor,jessica89@gmail.com,(626) 901-6122,2,374.4,6%,2024-11-13,2024-11-27,N,processing,SD
+230,Nancy Harris,nancy26@yahoo.com,381-899-2220,23,370.19,3%,2024-07-12,2024-07-13,N,done,OK
+231,William Garcia,wgarcia@company.com,+1 358-240-3518,77,34.92,29%,2024-11-16,2024-11-26,N,unknown,OR
+232,Daniel Williams,dwilliams@yahoo.com,2697173611,70,273.15,2%,2024-06-27,2024-07-01,Y,done,MI
+233,Charles Miller,cmiller@email.org,2093176668,31,453.2,19%,2024-11-14,2024-11-18,Y,canceled,MO
+234,Matthew Rodriguez,mrodriguez@outlook.com,(720) 656-8975,38,450.16,6%,2024-06-13,2024-06-22,Y,unknown,HI
+235,Paul Smith,paul.smith@yahoo.com,(410) 750-8130,96,346.16,0%,2024-08-23,2024-09-04,N,canceled,CO
+236,Patricia Garcia,patricia10@email.org,6175978391,56,165.04,12%,2024-12-10,2024-12-12,Y,unknown,CA
+237,John Thompson,jthompson@outlook.com,+1 508-821-2417,98,464.08,12%,2024-07-21,2024-08-04,Y,unknown,HI
+238,Joseph Jones,jjones@outlook.com,(946) 863-7113,71,438.64,4%,2024-03-04,2024-03-05,Y,waiting,RI
+239,Paul Moore,paul27@outlook.com,861-724-3333,24,118.19,26%,2024-05-09,2024-05-13,Y,unknown,TX
+240,Patricia Ramirez,patricia60@email.org,(887) 268-5107,26,365.54,15%,2024-06-18,2024-06-24,Y,done,CT
+241,Michelle Williams,mwilliams@outlook.com,+1 875-513-3496,41,479.74,5%,2024-01-03,2024-01-09,Y,waiting,VA
+242,Sarah Clark,sarah62@company.com,(993) 512-8978,23,326.32,2%,2024-05-23,2024-06-06,Y,done,IL
+243,  Robert White,rwhite@email.org,(614) 987-4485,71,137.7,28%,2024-10-03,2024-10-11,Y,complete,MT
+244,Donna White,donna.white@yahoo.com,(606) 572-9227,85,127.05,30%,2024-11-10,2024-11-21,Y,waiting,FL
+245,David Garcia,david85@yahoo.com,241-424-8989,9,139.53,7%,2024-01-22,2024-02-02,Y,waiting,MS
+246,Donald Robinson,drobinson@gmail.com,+1 733-848-5480,75,276.73,5%,2024-07-11,2024-07-22,N,shipped,PA
+247,Robert Taylor,robert67@company.com,698-693-1108,57,91.15,2%,2024-09-20,2024-10-01,N,processing,GA
+248,Barbara Garcia,barbara85@yahoo.com,9373168889,62,113.24,5%,2024-11-27,2024-12-11,N,pending,KS
+249,John Jones,jjones@gmail.com,+1 350-257-3725,24,263.15,12%,2024-11-02,2024-11-12,Y,shipped,CO
+250,Susan Anderson,susan62@yahoo.com,+1 815-346-3979,22,364.85,10%,2024-08-20,2024-08-30,Y,processing,EU
+251,  William Brown  ,wbrown@yahoo.com,(298) 381-8796,69,256.63,3%,2024-02-17,2024-02-25,Y,cancelled,XX
+252,Margaret Taylor,margaret.taylor@gmail.com,+1 693-987-7246,76,404.26,29%,2024-12-22,2025-01-01,Y,delivered,UK
+253,Donald Harris,donald37@email.org,(463) 393-1089,74,266.04,16%,2024-01-04,2024-01-11,Y,shipped,UK
+254,Michael Jones,michael33@outlook.com,7785745514,97,109.81,17%,2024-10-12,2024-10-20,Y,shipped,00
+255,Donald Rodriguez,drodriguez@yahoo.com,3219654764,90,475.13,3%,2024-04-19,2024-04-28,N,shipped,00
+256,Patricia Garcia,pgarcia@company.com,+1 645-290-2049,29,191.71,19%,2024-01-20,2024-02-01,N,delivered,ABC
+257,Kimberly Martinez,kimberly8@yahoo.com,+1 210-406-9489,25,26.47,19%,2024-09-18,2024-09-27,Y,cancelled,ABC
+258,John Lopez,john21@gmail.com,5618857474,76,108.15,0%,2024-12-26,2024-12-28,Y,cancelled,ABC
+259,Emily Robinson,emily.robinson@outlook.com,+1 665-613-1076,23,209.5,3%,2024-10-13,2024-10-15,N,shipped,00
+260,Thomas Lewis,tlewis@company.com,+1 695-988-4985,100,234.84,14%,2024-10-27,2024-11-10,Y,delivered,UK
+261,Robert Gonzalez,robert87@yahoo.com,(561) 728-9776,90,417.77,7%,2024-05-27,2024-05-29,N,shipped,CA
+262,Emily Robinson  ,emily.robinson@outlook.com,9648994115,95,107.84,23%,2024-05-03,2024-05-17,N,processing,IA
+263,Richard Clark,richard.clark@email.org,(280) 892-9071,98,429.97,30%,2024-01-22,2024-02-05,N,shipped,SC
+264,Christopher Thomas,cthomas@yahoo.com,486-607-4638,7,267.61,13%,2024-09-01,2024-09-10,Y,cancelled,MN
+265,Betty Ramirez,betty59@gmail.com,(523) 905-1137,87,113.27,18%,2024-02-21,2024-02-27,N,cancelled,KY
+266,Barbara Moore,barbara61@email.org,388-710-7945,54,353.35,11%,2024-07-05,2024-07-19,N,shipped,NH
+267,  Barbara Jackson  ,bjackson@yahoo.com,642-590-4212,95,83.28,25%,2024-01-05,2024-01-08,N,delivered,FL
+268,Kimberly Moore,kmoore@email.org,248-607-2621,8,115.58,8%,2024-08-31,2024-09-14,Y,delivered,WV
+269,Lisa Rodriguez,lisa.rodriguez@email.org,621-324-6752,74,292.19,20%,2024-10-02,2024-10-05,N,shipped,MA
+270,Steven Thomas,steven11@company.com,674-846-3373,82,405.78,10%,2024-08-03,2024-08-14,N,pending,CO
+271,David Hernandez,dhernandez@outlook.com,8606045444,100,432.78,11%,2024-10-27,2024-11-05,N,delivered,HI
+272,  Barbara Ramirez  ,barbara.ramirez@yahoo.com,(370) 606-2687,9,469.03,15%,2024-10-07,2024-10-08,Y,delivered,ND
+273,Jennifer Brown,jennifer.brown@yahoo.com,4539555655,81,71.94,16%,2024-03-28,2024-03-29,Y,shipped,MA
+274,Donald Anderson,donald.anderson@email.org,9147523900,81,376.97,28%,2024-10-15,2024-10-22,N,shipped,NM
+275,Paul Davis,paul40@outlook.com,(359) 510-1172,67,409.54,27%,2024-03-10,2024-03-16,N,delivered,OH
+276,James Thompson,james39@gmail.com,+1 811-436-1118,25,211.75,17%,2024-08-11,2024-08-18,Y,processing,VA
+277,Matthew Clark,mclark@yahoo.com,+1 982-827-5454,84,374.03,25%,2024-05-17,2024-05-24,Y,pending,ID
+278,William Martinez  ,william58@outlook.com,392-528-1317,7,485.16,0%,2024-04-05,2024-04-07,N,shipped,FL
+279,  Mark White,mark2@company.com,+1 630-519-9165,60,351.5,1%,2024-06-18,2024-06-20,Y,pending,LA
+280,Betty Williams,betty.williams@yahoo.com,3249865078,99,487.74,7%,2024-01-18,2024-01-22,N,pending,ND
+281,Susan Thomas,sthomas@gmail.com,+1 762-733-3001,62,322.87,6%,2024-07-03,2024-07-04,Y,pending,KS
+282,Margaret Hernandez  ,margaret.hernandez@email.org,243-795-8786,48,387.69,7%,2024-03-21,2024-03-29,Y,cancelled,MI
+283,Patricia Johnson,patricia.johnson@yahoo.com,+1 699-438-6189,57,369.26,0%,2024-12-18,2024-12-25,N,processing,KY
+284,John Thomas,john.thomas@email.org,+1 780-391-9906,42,368.88,8%,2024-11-02,2024-11-16,Y,pending,ND
+285,Elizabeth Anderson,elizabeth.anderson@outlook.com,9948539289,94,100.91,0%,2024-11-13,2024-11-27,N,cancelled,KS
+286,  Christopher White  ,cwhite@company.com,+1 357-827-5638,53,324.04,3%,2024-02-19,2024-02-28,Y,pending,FL
+287,  Barbara Ramirez,bramirez@gmail.com,+1 857-597-9026,7,189.51,19%,2024-02-06,2024-02-07,Y,delivered,CO
+288,Sandra Sanchez,ssanchez@outlook.com,(259) 831-5355,94,44.49,9%,2024-02-09,2024-02-13,Y,pending,WA
+289,Joseph Moore,jmoore@email.org,(383) 771-7802,99,322.93,11%,2024-12-11,2024-12-19,N,pending,HI
+290,Barbara Moore,bmoore@email.org,+1 653-560-6163,48,212.05,20%,2024-08-08,2024-08-22,N,cancelled,KS
+291,Andrew Moore,andrew96@outlook.com,(658) 606-1003,37,301.92,16%,2024-03-10,2024-03-15,Y,shipped,IA
+292,Susan Ramirez,sramirez@email.org,(785) 358-2544,59,184.27,4%,2024-05-15,2024-05-21,Y,processing,KY
+293,Karen Williams,karen28@gmail.com,+1 377-699-2562,5,368.09,18%,2024-07-14,2024-07-16,Y,shipped,MN
+294,Margaret Wilson,margaret.wilson@gmail.com,(849) 996-7266,40,266.95,10%,2024-10-03,2024-10-13,Y,shipped,NC
+295,  Joseph Jones  ,jjones@email.org,+1 292-427-8076,51,82.53,10%,2024-02-12,2024-02-20,Y,cancelled,MT
+296,Thomas Williams,thomas90@yahoo.com,7724028993,84,289.95,17%,2024-11-11,2024-11-23,Y,processing,CA
+297,Sarah Harris,sarah12@gmail.com,+1 574-556-4120,45,301.0,0%,2024-06-05,2024-06-08,N,cancelled,NH
+298,Michelle Jones,mjones@yahoo.com,287-315-1893,80,464.1,27%,2024-05-27,2024-05-28,N,pending,MD
+299,  Mark Thomas,mthomas@email.org,9684649991,80,367.66,4%,2024-12-21,2025-01-02,Y,delivered,PA
+300,Kimberly Johnson,,(254) 676-1136,50,333.58,21%,2024-12-03,2024-12-09,Y,pending,ME
+301,Matthew Davis,double@@at.com,811-744-2442,26,255.32,14%,2024-10-14,2024-10-26,Y,pending,KS
+302,Karen Hernandez,missing@domain,+1 840-509-4869,8,316.64,28%,2024-07-17,2024-07-31,Y,cancelled,LA
+303,Elizabeth Hernandez,missing@domain,8278404726,31,290.72,13%,2024-06-08,2024-06-18,N,delivered,OH
+304,  Susan Lee  ,notanemail,640-988-3378,41,43.23,17%,2024-03-01,2024-03-04,N,processing,WA
+305,Christopher Lewis,missing@domain,997-392-2749,24,22.84,19%,2024-11-11,2024-11-16,Y,cancelled,IA
+306,Mary Lopez  ,notanemail,8655824014,63,242.18,5%,2024-04-08,2024-04-12,Y,delivered,WI
+307,Sarah Walker,,+1 649-831-9027,59,444.92,13%,2024-07-26,2024-08-08,Y,cancelled,WV
+308,Matthew White,spaces in@email.com,(737) 856-1630,58,233.88,28%,2024-01-22,2024-01-26,N,pending,OK
+309,Kimberly Harris,spaces in@email.com,5119925684,22,217.01,19%,2024-01-28,2024-02-09,Y,delivered,TN
+310,Jennifer White,@nodomain.com,(623) 531-8387,23,232.3,28%,2024-12-30,2025-01-03,N,pending,KY
+311,David Thompson,david.thompson@gmail.com,736-924-7292,49,279.67,1%,2024-03-28,2024-04-03,Y,processing,GA
+312,Barbara Harris,barbara40@outlook.com,841-385-2926,26,11.73,24%,2024-05-09,2024-05-10,N,delivered,NY
+313,Paul Sanchez  ,paul28@email.org,(619) 652-2300,32,442.26,8%,2024-11-13,2024-11-24,Y,pending,ID
+314,Elizabeth Johnson,ejohnson@email.org,(505) 539-2436,14,214.31,5%,2024-03-23,2024-04-03,N,cancelled,TX
+315,Joshua Jackson,joshua.jackson@yahoo.com,+1 295-986-5903,48,449.79,26%,2024-02-04,2024-02-17,N,cancelled,CA
+316,  Charles Thomas  ,cthomas@company.com,(414) 912-4425,14,289.97,20%,2024-09-27,2024-09-29,N,cancelled,VA
+317,Charles Wilson,cwilson@email.org,5623329132,64,405.91,28%,2024-11-08,2024-11-12,N,processing,AL
+318,Linda Smith,linda95@yahoo.com,+1 623-246-6468,72,404.96,6%,2024-01-06,2024-01-17,Y,shipped,KY
+319,Robert Martinez,rmartinez@gmail.com,(541) 549-7488,23,105.07,26%,2024-06-22,2024-07-03,N,delivered,AZ
+320,William Thomas  ,wthomas@company.com,not-a-phone,72,272.58,6%,2024-10-22,2024-11-02,N,shipped,CA
+321,Sarah Clark  ,sarah22@email.org,not-a-phone,91,430.33,22%,2024-01-17,2024-01-22,N,pending,NY
+322,Nancy Anderson,nancy.anderson@outlook.com,12345678901234,12,227.45,0%,2024-09-04,2024-09-13,Y,processing,MI
+323,Kimberly Martinez,kmartinez@email.org,(000) 000-0000,50,359.7,16%,2024-02-29,2024-03-01,N,pending,UT
+324,Jennifer Hernandez,jennifer.hernandez@gmail.com,123,42,108.27,9%,2024-05-21,2024-05-30,N,delivered,TX
+325,  Sarah Jones,sarah.jones@gmail.com,123-456,35,79.36,22%,2024-05-25,2024-06-04,Y,processing,CA
+326,Michelle Lewis,michelle7@yahoo.com,123-456,7,52.2,12%,2024-04-01,2024-04-13,N,cancelled,MN
+327,  Lisa Clark  ,lisa.clark@email.org,not-a-phone,59,162.09,20%,2024-12-29,2025-01-11,N,delivered,IA
+328,Elizabeth Ramirez,eramirez@yahoo.com,123-456,63,24.83,15%,2024-02-27,2024-03-04,N,delivered,HI
+329,Daniel Martin,daniel14@company.com,12345678901234,69,235.88,18%,2024-07-30,2024-08-03,Y,cancelled,HI
+330,Matthew Williams,matthew56@company.com,(000) 000-0000,85,338.11,23%,2024-12-30,2025-01-09,N,pending,PA
+331,Sandra Hernandez,sandra.hernandez@company.com,+1 812-311-7208,64,326.04,1%,2024-02-16,2024-02-20,Y,cancelled,WI
+332,  James Harris,jharris@company.com,791-657-4205,88,439.94,9%,2024-10-18,2024-10-31,N,delivered,VA
+333,Daniel Williams,daniel66@company.com,(263) 578-9992,1,354.64,26%,2024-07-02,2024-07-04,N,pending,KS
+334,Margaret Thompson,margaret92@company.com,645-758-4460,61,78.14,17%,2024-07-15,2024-07-29,N,delivered,GA
+335,Charles Ramirez,charles.ramirez@yahoo.com,938-698-8155,11,77.24,25%,2024-07-31,2024-08-14,N,cancelled,NV
+336,Michelle Garcia,michelle71@company.com,(431) 390-7959,74,254.1,23%,2024-05-01,2024-05-13,N,delivered,OH
+337,  Andrew Lopez,alopez@gmail.com,693-907-2311,94,368.33,27%,2024-05-23,2024-05-31,Y,cancelled,SC
+338,Jennifer Davis,jennifer88@email.org,(827) 254-6628,61,232.48,28%,2024-08-28,2024-09-07,N,delivered,MN
+339,  Charles Martinez  ,charles96@outlook.com,262-844-8752,74,35.29,9%,2024-11-15,2024-11-16,N,delivered,CO
+340,William Taylor  ,william17@email.org,463-214-2827,76,372.09,21%,2024-08-16,2024-08-22,Y,shipped,VT
+341,  Jessica Thomas  ,jthomas@yahoo.com,3577077765,31,333.73,23%,2024-11-22,2024-11-25,Y,cancelled,WA
+342,Daniel Johnson,daniel7@yahoo.com,687-508-8803,49,344.92,12%,2024-08-30,2024-09-04,Y,cancelled,NV
+343,James Martinez,jmartinez@email.org,+1 242-299-9704,56,309.14,20%,2024-05-19,2024-05-25,N,shipped,CT
+344,Thomas Lee,thomas.lee@company.com,+1 732-545-3947,71,15.18,0%,2024-02-04,2024-02-05,N,pending,ND
+345,Michael Perez,michael.perez@yahoo.com,(234) 224-2506,77,331.74,26%,2024-04-21,2024-05-01,Y,pending,CO
+346,Joshua Jones,joshua24@gmail.com,5016782240,36,386.99,22%,2024-12-07,2024-12-20,N,shipped,HI
+347,Robert Rodriguez,robert50@outlook.com,(471) 382-8218,63,489.92,6%,2024-11-08,2024-11-15,Y,delivered,CT
+348,Elizabeth Moore,emoore@company.com,(465) 305-1571,10,289.96,8%,2024-08-16,2024-08-17,N,processing,TN
+349,James Robinson  ,jrobinson@company.com,2037279039,56,207.92,23%,2024-02-05,2024-02-14,Y,pending,MO
+350,Donald Brown,donald.brown@outlook.com,+1 847-862-2485,69,428.14,10%,2024-05-13,2024-05-10,N,shipped,TN
+351,Emily Johnson,ejohnson@gmail.com,(905) 567-8970,81,224.61,6%,2024-11-29,2024-11-25,Y,pending,WA
+352,  Ashley Gonzalez  ,ashley.gonzalez@outlook.com,+1 237-547-1918,93,30.98,3%,2024-11-22,2024-11-18,N,cancelled,GA
+353,Robert Johnson,rjohnson@company.com,(246) 448-3138,23,320.0,28%,2024-04-27,2024-04-17,Y,delivered,SC
+354,Robert Clark,robert.clark@gmail.com,+1 264-407-7983,95,342.41,10%,2024-02-23,2024-02-13,Y,shipped,IN
+355,Barbara Hernandez  ,bhernandez@yahoo.com,5787663703,32,463.58,1%,2024-10-06,2024-10-04,N,processing,AK
+356,  James Smith,jsmith@company.com,+1 329-411-3344,67,230.71,7%,2024-10-12,2024-10-02,Y,cancelled,ID
+357,Jennifer Lee,jlee@gmail.com,(441) 396-2925,80,187.33,24%,2024-12-16,2024-12-12,Y,delivered,WY
+358,  Sarah Johnson,sjohnson@yahoo.com,+1 244-255-6966,27,222.99,10%,2024-02-26,2024-02-17,N,pending,CT
+359,Barbara Garcia,barbara.garcia@company.com,9386556340,26,376.07,28%,2024-03-21,2024-03-17,Y,shipped,IA
+360,  Anthony Ramirez,anthony.ramirez@gmail.com,6463484541,23,199.79,4%,2024-05-13,2024-05-07,Y,shipped,LA
+361,William Johnson,william36@yahoo.com,+1 669-628-3804,29,444.34,19%,2024-03-21,2024-04-03,Y,cancelled,OK
+362,Joseph Williams,joseph63@yahoo.com,6734851237,95,437.57,7%,2024-06-16,2024-06-23,Y,cancelled,GA
+363,  Andrew Lewis,andrew61@email.org,(743) 603-8852,58,252.69,2%,2024-10-12,2024-10-25,Y,delivered,IN
+364,William Lopez,william.lopez@gmail.com,9206701399,60,388.2,27%,2024-12-26,2025-01-02,Y,shipped,SD
+365,Sandra Thompson,sandra.thompson@gmail.com,503-636-5420,88,49.67,28%,2024-06-20,2024-07-02,Y,cancelled,UT
+366,Nancy Lewis  ,nancy60@email.org,575-379-2097,18,490.81,7%,2024-10-03,2024-10-05,N,cancelled,VT
+367,Susan Harris,sharris@outlook.com,(896) 633-5540,9,192.68,14%,2024-09-05,2024-09-14,Y,delivered,VA
+368,Paul Perez,pperez@outlook.com,9092674085,12,49.28,28%,2024-04-01,2024-04-06,Y,pending,HI
+369,Sarah Brown,sbrown@email.org,223-500-7824,61,179.88,14%,2024-11-26,2024-11-27,N,processing,CA
+370,Mary Ramirez,mramirez@company.com,5518716346,76,336.27,16%,2024-10-07,2024-10-15,N,shipped,OR
+371,William Lewis,william34@yahoo.com,495-988-1775,46,149.35,30%,2024-03-26,2024-04-05,Y,cancelled,ME
+372,Barbara Garcia,barbara.garcia@yahoo.com,5247883072,34,191.14,6%,2024-10-14,2024-10-26,Y,shipped,MN
+373,Elizabeth Lopez,elizabeth.lopez@yahoo.com,6147113381,41,86.47,23%,2024-10-06,2024-10-15,N,shipped,NM
+374,Charles Walker,cwalker@email.org,6525462840,6,78.32,17%,2024-02-29,2024-03-05,Y,delivered,SC
+375,Joseph Anderson,janderson@yahoo.com,739-427-5553,3,50.96,27%,2024-08-16,2024-08-27,Y,cancelled,MT
+376,Richard Thomas,richard66@gmail.com,+1 351-933-8006,50,192.69,9%,2024-06-25,2024-07-01,N,delivered,OK
+377,Jennifer Miller,jennifer95@company.com,3679457944,18,419.4,19%,2024-02-14,2024-02-17,Y,shipped,NM
+378,  Kimberly Hernandez  ,khernandez@company.com,4796243865,91,288.28,29%,2024-03-11,2024-03-15,Y,delivered,ME
+379,Emily Thomas  ,ethomas@email.org,(674) 429-1439,20,138.71,30%,2024-11-23,2024-12-07,N,pending,TN
+380,  Charles Wilson  ,charles4@gmail.com,2688136927,73,223.67,8%,2024-11-17,2024-11-28,N,pending,MS
+381,Steven White,steven.white@outlook.com,+1 527-672-3219,21,35.92,11%,2024-08-02,2024-08-13,N,pending,ME
+382,Charles Taylor,charles.taylor@gmail.com,+1 813-970-3738,41,415.14,21%,2024-06-03,2024-06-08,N,pending,OH
+383,Donna Lopez,donna18@email.org,+1 997-696-7750,21,60.18,4%,2024-09-14,2024-09-18,Y,cancelled,SC
+384,Kimberly Ramirez,kimberly90@gmail.com,(278) 319-3150,62,180.62,22%,2024-07-04,2024-07-07,N,cancelled,ND
+385,Lisa Garcia,lisa.garcia@gmail.com,+1 910-345-4712,17,112.82,2%,2024-08-05,2024-08-17,Y,pending,AK
+386,Donald Harris,dharris@email.org,+1 260-680-2948,6,42.46,21%,2024-01-06,2024-01-19,Y,pending,RI
+387,Susan Jackson,susan.jackson@yahoo.com,+1 349-964-5544,46,88.67,16%,2024-11-09,2024-11-13,Y,pending,PA
+388,James Taylor,james.taylor@yahoo.com,9423014506,47,352.09,5%,2024-08-13,2024-08-24,Y,processing,MN
+389,Matthew Wilson,matthew.wilson@yahoo.com,677-312-9515,64,383.51,22%,2024-05-27,2024-06-05,Y,pending,MA
+390,Ashley Brown,ashley.brown@company.com,7676175761,25,429.82,28%,2024-08-31,2024-09-11,N,processing,AL
+391,Ashley Perez  ,ashley.perez@email.org,604-610-2666,9,188.22,6%,2024-06-22,2024-06-26,N,pending,IA
+392,Margaret White,margaret76@outlook.com,6878827626,66,146.66,24%,2024-08-20,2024-08-22,Y,shipped,NY
+393,Ashley Davis,ashley.davis@yahoo.com,710-894-1438,49,306.25,10%,2024-03-19,2024-03-24,Y,pending,TX
+394,Kimberly Harris,kimberly26@outlook.com,+1 716-467-9887,70,277.84,30%,2024-01-17,2024-01-24,Y,delivered,NH
+395,Christopher Ramirez,cramirez@yahoo.com,875-998-5965,63,221.03,9%,2024-07-18,2024-07-26,Y,cancelled,UT
+396,Ashley Perez,aperez@company.com,3607181913,34,252.4,12%,2024-11-11,2024-11-22,N,shipped,MA
+397,Patricia Smith,patricia.smith@yahoo.com,9838406591,13,219.79,11%,2024-07-29,2024-08-04,Y,processing,KS
+398,Jessica Lee,jessica.lee@gmail.com,+1 545-373-1322,5,235.85,27%,2024-08-04,2024-08-14,N,shipped,AK
+399,Donald Jackson  ,djackson@outlook.com,300-700-2639,44,253.4,25%,2024-12-07,2024-12-13,Y,cancelled,MD
+400,Nancy Wilson,nancy69@yahoo.com,248-504-7586,80,374.02,2%,2024-10-23,2024-10-25,N,unknown,CA
+401,Kimberly Thomas,kimberly10@outlook.com,+1 643-879-9846,26,213.01,8%,2024-11-15,2024-11-24,N,canceled,ID
+402,Kimberly Ramirez  ,kramirez@outlook.com,(745) 829-8106,67,108.32,14%,2024-03-16,2024-03-20,Y,waiting,NV
+403,Christopher Ramirez,christopher82@yahoo.com,+1 493-861-3631,88,304.6,12%,2024-05-02,2024-05-04,Y,complete,AK
+404,Karen Anderson,karen.anderson@company.com,+1 479-339-1477,36,332.75,5%,2024-11-25,2024-12-09,Y,canceled,AK
+405,Jennifer Hernandez,jennifer53@outlook.com,(941) 343-4867,74,369.9,29%,2024-03-02,2024-03-11,N,complete,CO
+406,Joshua Brown,jbrown@company.com,961-441-7928,19,62.34,6%,2024-05-20,2024-05-28,N,canceled,PA
+407,Ashley Moore,ashley41@email.org,899-452-5550,47,242.86,11%,2024-06-06,2024-06-07,Y,complete,VT
+408,Thomas Moore,thomas.moore@outlook.com,6535971128,33,157.44,29%,2024-04-30,2024-05-05,Y,done,NH
+409,  Anthony Sanchez,asanchez@outlook.com,+1 632-302-3627,65,42.52,13%,2024-11-04,2024-11-16,N,canceled,VT
+410,Patricia Lee,patricia83@yahoo.com,+1 404-843-6006,74,50.29,5%,2024-05-07,2024-05-16,Y,waiting,UT
+411,Christopher Anderson,christopher34@yahoo.com,4884032382,48,99.13,28%,2024-07-12,2024-07-26,Y,pending,AK
+412,Emily Lee,emily12@company.com,9183721815,80,220.16,8%,2024-03-17,2024-03-19,N,processing,OR
+413,Linda Smith,linda.smith@company.com,429-930-4328,35,151.1,15%,2024-07-14,2024-07-17,N,processing,RI
+414,Susan Clark,susan.clark@yahoo.com,229-497-5289,80,230.98,7%,2024-07-08,2024-07-18,N,pending,AL
+415,Donald Jones,djones@company.com,(633) 953-5198,13,282.93,1%,2024-06-19,2024-06-23,N,shipped,RI
+416,Joshua Thompson,jthompson@email.org,+1 590-509-7466,17,484.35,17%,2024-01-22,2024-02-01,Y,shipped,HI
+417,Steven Thomas,sthomas@outlook.com,+1 743-643-3323,15,163.5,4%,2024-09-12,2024-09-26,N,shipped,NV
+418,Charles Lewis,charles98@outlook.com,6463686169,98,475.52,17%,2024-12-02,2024-12-13,N,pending,IL
+419,Elizabeth Johnson,ejohnson@yahoo.com,6786462900,6,226.34,22%,2024-10-14,2024-10-22,N,delivered,DE
+420,Elizabeth Brown,ebrown@yahoo.com,(720) 479-4479,68,385.76,5%,2024-08-01,2024-08-03,Y,delivered,UT
+421,Michael Lewis,michael88@gmail.com,804-308-6300,4,49.72,26%,2024-12-28,2025-01-08,N,delivered,SD
+422,Sarah Martin,sarah6@email.org,949-951-3118,7,402.76,9%,2024-06-14,2024-06-27,Y,pending,OK
+423,Joshua Gonzalez  ,joshua.gonzalez@yahoo.com,4133667365,37,327.11,30%,2024-11-30,2024-12-03,Y,shipped,NY
+424,Margaret White,margaret88@email.org,881-298-7020,63,228.27,12%,2024-08-31,2024-09-05,N,pending,WI
+425,Margaret Sanchez,margaret.sanchez@yahoo.com,725-549-8594,83,346.26,4%,2024-09-10,2024-09-19,Y,shipped,NJ
+426,Margaret Williams,mwilliams@yahoo.com,5074549570,38,288.58,17%,2024-02-09,2024-02-10,Y,cancelled,NV
+427,Anthony Brown,abrown@outlook.com,(283) 987-9248,15,372.85,14%,2024-04-01,2024-04-14,Y,delivered,AZ
+428,Jennifer Wilson,jwilson@company.com,+1 660-838-5342,24,113.42,2%,2024-11-05,2024-11-10,Y,delivered,OH
+429,Mary Smith,msmith@company.com,+1 614-873-8974,80,408.43,19%,2024-07-03,2024-07-15,N,shipped,CO
+430,  William Jones,william.jones@gmail.com,692-864-3378,56,422.62,27%,2024-10-02,2024-10-06,Y,shipped,WY
+431,Sandra Jones,sjones@yahoo.com,9196558947,3,431.3,18%,2024-05-04,2024-05-08,N,cancelled,MT
+432,  Patricia Hernandez  ,phernandez@email.org,(948) 767-5764,63,205.84,16%,2024-10-29,2024-11-10,N,processing,VA
+433,  Patricia Taylor  ,ptaylor@outlook.com,6276842915,80,470.09,11%,2024-08-17,2024-08-29,N,pending,HI
+434,Charles White  ,cwhite@yahoo.com,901-547-8675,38,364.27,12%,2024-08-01,2024-08-15,N,delivered,HI
+435,Michelle Miller,michelle.miller@gmail.com,(404) 360-9063,54,472.1,15%,2024-06-04,2024-06-08,Y,cancelled,AR
+436,Mary Lopez,mlopez@yahoo.com,2322656533,15,312.61,3%,2024-10-14,2024-10-18,N,shipped,MI
+437,  Daniel Harris  ,dharris@email.org,3069231826,59,481.7,24%,2024-02-26,2024-02-28,Y,cancelled,AZ
+438,  Steven Brown,sbrown@outlook.com,6529809288,94,436.54,4%,2024-11-27,2024-12-03,N,processing,DE
+439,Richard Anderson,richard32@company.com,+1 717-375-2396,48,360.45,13%,2024-07-03,2024-07-14,Y,processing,WI
+440,Kimberly Wilson,kimberly55@company.com,(728) 898-6927,57,81.34,0%,2024-09-21,2024-09-23,Y,shipped,MA
+441,  Betty Harris,bharris@yahoo.com,+1 259-846-9516,54,206.98,21%,2024-12-24,2025-01-02,N,shipped,MN
+442,James Clark,james79@yahoo.com,8594109919,90,179.17,25%,2024-11-28,2024-12-05,Y,shipped,CO
+443,John Moore,john.moore@yahoo.com,+1 295-723-6115,97,321.49,0%,2024-01-15,2024-01-28,N,processing,WY
+444,Karen White,karen15@gmail.com,(842) 719-6807,7,380.71,30%,2024-03-04,2024-03-12,N,cancelled,WV
+445,James Anderson,janderson@email.org,842-881-9737,45,156.61,21%,2024-10-20,2024-10-31,Y,delivered,ND
+446,Jessica Brown,jessica.brown@email.org,3509287974,11,55.2,13%,2024-03-07,2024-03-15,Y,delivered,CA
+447,Nancy Perez,nancy72@email.org,7987107937,89,466.21,15%,2024-08-01,2024-08-15,Y,processing,NC
+448,William Thomas,william.thomas@yahoo.com,9114178461,5,375.78,30%,2024-10-13,2024-10-19,Y,cancelled,NE
+449,Linda Brown,linda.brown@outlook.com,+1 580-512-7135,38,248.1,25%,2024-03-14,2024-03-17,N,pending,MD
+450,  Charles Miller  ,charles1@gmail.com,2692457841,74,161.75,14%,2024-06-21,2024-07-04,N,delivered,00
+451,  William Harris  ,william.harris@company.com,9455332463,50,124.08,12%,2024-06-22,2024-07-01,Y,delivered,UK
+452,  Jennifer Ramirez,jramirez@email.org,326-859-2395,80,275.5,24%,2024-01-28,2024-02-07,Y,delivered,XX
+453,Linda Perez,linda.perez@yahoo.com,(922) 793-8278,69,307.36,12%,2024-10-28,2024-10-29,N,pending,EU
+454,  Barbara Wilson  ,barbara.wilson@outlook.com,+1 301-754-3755,19,99.51,24%,2024-02-15,2024-02-18,N,delivered,ZZ
+455,Patricia Martin,patricia4@gmail.com,3015273334,42,136.39,30%,2024-03-02,2024-03-03,Y,processing,00
+456,Donna Davis,donna.davis@email.org,(525) 675-7669,62,24.16,20%,2024-04-29,2024-04-30,N,cancelled,PA
+457,Michael Davis,michael39@email.org,285-851-9199,19,192.92,5%,2024-05-05,2024-05-14,N,cancelled,NH
+458,John Smith,john.smith@email.org,6934795110,45,422.79,6%,2024-10-26,2024-11-09,N,pending,HI
+459,  Paul Jackson,pjackson@yahoo.com,769-486-8077,79,257.36,25%,2024-06-11,2024-06-22,N,shipped,WI
+460,Mark Rodriguez,mrodriguez@company.com,(536) 216-3190,78,243.5,28%,2024-01-05,2024-01-16,Y,delivered,OK
+461,Ashley Harris,ashley.harris@gmail.com,+1 887-655-3022,49,415.46,11%,2024-07-17,2024-07-20,Y,pending,NJ
+462,  Nancy Robinson,nrobinson@outlook.com,(926) 566-4137,79,316.37,25%,2024-04-23,2024-04-27,N,shipped,AZ
+463,Sarah Thomas,sthomas@yahoo.com,6053135544,22,280.37,21%,2024-10-16,2024-10-27,Y,pending,PA
+464,William White  ,william.white@email.org,+1 894-223-9731,88,284.46,14%,2024-01-02,2024-01-09,Y,shipped,NV
+465,  Anthony Rodriguez  ,anthony.rodriguez@company.com,+1 938-429-1769,54,270.88,10%,2024-01-03,2024-01-10,Y,shipped,CO
+466,  Andrew Sanchez  ,andrew.sanchez@yahoo.com,+1 401-368-6394,9,316.74,3%,2024-01-15,2024-01-23,N,pending,PA
+467,Lisa Clark,lisa.clark@gmail.com,(541) 732-4878,100,303.98,14%,2024-02-18,2024-02-29,N,cancelled,DE
+468,Jennifer Johnson,jennifer.johnson@company.com,6522565939,9,59.9,1%,2024-10-13,2024-10-14,N,delivered,MT
+469,Michael Martin,michael77@email.org,(593) 675-8014,44,328.95,21%,2024-01-14,2024-01-22,N,cancelled,IL
+470,  Michael Brown  ,michael.brown@gmail.com,+1 852-721-5198,54,245.89,19%,2024-08-15,2024-08-18,Y,processing,AZ
+471,Patricia Jones,pjones@outlook.com,754-994-3385,61,161.25,10%,2024-05-29,2024-06-04,Y,cancelled,PA
+472,Elizabeth Johnson,elizabeth.johnson@email.org,(405) 855-4297,44,102.78,15%,2024-12-21,2025-01-02,N,cancelled,VT
+473,Lisa Ramirez,lisa79@outlook.com,(366) 307-8443,64,117.51,0%,2024-11-23,2024-11-27,Y,delivered,SC
+474,Susan Davis,susan95@company.com,(388) 206-6944,10,185.36,17%,2024-02-28,2024-03-02,N,delivered,IL
+475,Donna Robinson,donna4@yahoo.com,378-424-5292,44,425.29,7%,2024-04-01,2024-04-05,Y,processing,KY
+476,Michael Smith,michael.smith@yahoo.com,+1 512-667-4934,48,333.85,30%,2024-09-26,2024-10-09,N,pending,DE
+477,Elizabeth Lewis,elewis@company.com,583-525-8037,6,383.91,18%,2024-04-06,2024-04-20,N,processing,MA
+478,Jessica Johnson,jessica17@email.org,4149442333,85,311.29,5%,2024-09-17,2024-09-24,N,delivered,ND
+479,Sandra Garcia,sandra68@company.com,(474) 795-7569,27,117.57,6%,2024-08-19,2024-09-02,Y,delivered,IN
+480,Karen Wilson,kwilson@outlook.com,+1 286-337-2376,57,264.22,7%,2024-10-25,2024-10-26,N,cancelled,SC
+481,Lisa Wilson,lisa53@outlook.com,479-591-1404,57,124.56,20%,2024-02-08,2024-02-14,Y,shipped,NC
+482,Steven Moore,steven.moore@outlook.com,568-239-9946,43,106.36,10%,2024-05-08,2024-05-13,N,processing,VA
+483,Joshua Jones,joshua34@gmail.com,(554) 613-7647,61,330.5,24%,2024-03-17,2024-03-31,N,processing,IA
+484,Susan Thomas,susan71@company.com,2875204077,99,471.55,13%,2024-04-17,2024-04-25,N,cancelled,AK
+485,Nancy Jones,njones@company.com,5635474694,55,346.02,12%,2024-12-19,2024-12-28,N,shipped,PA
+486,Mary Jackson,mjackson@email.org,8178227404,27,474.86,2%,2024-09-30,2024-10-07,Y,delivered,CT
+487,Lisa Jackson,ljackson@gmail.com,7663811525,4,101.48,2%,2024-07-16,2024-07-21,Y,processing,ME
+488,Kimberly Williams,kimberly67@gmail.com,(620) 600-3572,17,272.86,15%,2024-02-05,2024-02-12,Y,processing,IN
+489,Karen Wilson,karen21@email.org,8014079232,36,108.83,4%,2024-08-16,2024-08-18,N,cancelled,KS
+490,Kimberly Hernandez,kimberly.hernandez@company.com,9542935717,45,353.16,22%,2024-06-01,2024-06-08,Y,delivered,KS
+491,Barbara Lewis,blewis@yahoo.com,(782) 297-7447,31,443.92,5%,2024-05-20,2024-05-31,N,pending,VT
+492,Susan Robinson,susan.robinson@email.org,7169846341,58,90.77,6%,2024-09-16,2024-09-17,N,pending,CA
+493,Sandra Gonzalez,sandra.gonzalez@company.com,+1 456-317-3236,86,376.85,15%,2024-08-24,2024-08-26,Y,cancelled,TX
+494,Jessica Thompson,jessica.thompson@yahoo.com,218-821-2646,38,70.83,23%,2024-07-19,2024-07-22,Y,pending,UT
+495,Sarah Jones,sarah.jones@yahoo.com,(652) 913-1782,50,348.27,14%,2024-01-27,2024-02-06,Y,pending,WY
+496,Matthew Harris,matthew.harris@yahoo.com,(216) 631-1457,44,412.06,21%,2024-12-08,2024-12-10,Y,pending,TX
+497,David White  ,dwhite@outlook.com,8413944393,55,69.19,6%,2024-02-24,2024-03-01,N,processing,AL
+498,Betty Lee,betty.lee@company.com,(873) 485-7045,9,443.88,13%,2024-06-03,2024-06-16,N,pending,VA
+499,Paul Sanchez,psanchez@gmail.com,532-846-7366,43,95.91,24%,2024-12-18,2024-12-24,N,pending,MI
+500,Mary Martin,mmartin@yahoo.com,801-921-1217,3,312.01,28%,2024-03-04,2024-03-09,Y,delivered,WI

@@ -415,3 +415,66 @@ def download_button_styled(
         help=help_text,
         use_container_width=True,
     )
+
+
+def demo_tip(message: str) -> None:
+    """
+    Display a demo tip info box if in demo mode.
+
+    This component shows helpful tips during the demo walkthrough
+    to guide users through the application features.
+
+    Args:
+        message: The tip message to display
+    """
+    if st.session_state.get("is_demo_mode"):
+        st.markdown(
+            f'<div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; '
+            f'padding: 12px 16px; margin: 8px 0; border-radius: 4px;">'
+            f'<span style="color: #92400E; font-weight: 600;">Demo Tip:</span> '
+            f'<span style="color: #78350F;">{message}</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+
+# Demo column explanations - explains why each test is configured for the demo
+DEMO_COLUMN_EXPLANATIONS = {
+    "order_id": "Each order needs a unique ID. The **Uniqueness** test catches duplicate order IDs that could cause data integrity issues.",
+    "customer_name": "Customer name is marked as **Required** to ensure every order is associated with a customer. Missing names would make the data incomplete.",
+    "email": "The **Email Pattern** test validates that email addresses follow the standard format (user@domain.com). Invalid emails can't receive order confirmations.",
+    "phone": "The **US Phone** pattern validates phone numbers match common US formats like (555) 123-4567 or 555-123-4567. This catches typos and incomplete numbers.",
+    "quantity": "The **Range (1-1000)** test ensures order quantities are reasonable. Zero, negative, or extremely large quantities likely indicate data entry errors.",
+    "unit_price": "The **Range (0-10000)** test validates prices are positive and within expected bounds. Negative prices or extreme values suggest errors.",
+    "discount_pct": "Discount percentages should be between 0-100. The **Remove Punctuation** treatment strips the '%' symbol, and the **Range** test validates the numeric value.",
+    "order_date": "The **Expected Date Format (YYYY-MM-DD)** rule ensures dates are in a consistent format. Mixed formats like '01/15/2024' or 'Jan 15, 2024' cause sorting and filtering issues.",
+    "ship_date": "Same as order_date, the **Expected Date Format** rule enforces consistency. The **Cross-Field Validation** (at page bottom) also checks that ship_date is on or after order_date.",
+    "is_priority": "This boolean column accepts Y/N values. Inconsistent formats like 'true', 'yes', or '1' may need standardization.",
+    "status": "The **Approved Values** test ensures status values match your business workflow. Note: 'canceled' (American spelling) will fail because only 'cancelled' (British) is in the approved list.",
+    "state_code": "The **US State Preset** validates against all 50 US state codes. Invalid codes like 'XX' or 'UK' are caught automatically.",
+}
+
+
+def demo_column_explanation(column_name: str) -> None:
+    """
+    Display a blue explanation box for a column in demo mode.
+
+    Shows why certain tests are pre-configured for each column in the demo,
+    helping users understand the purpose of each validation rule.
+
+    Args:
+        column_name: The name of the column to explain
+    """
+    if not st.session_state.get("is_demo_mode"):
+        return
+
+    explanation = DEMO_COLUMN_EXPLANATIONS.get(column_name)
+    if explanation:
+        st.markdown(
+            f'<div style="background-color: #EBF8FF; border-left: 4px solid #3182CE; '
+            f'padding: 12px 16px; margin: 8px 0 16px 0; border-radius: 4px;">'
+            f'<span style="color: #2C5282; font-weight: 600;">Why this test?</span> '
+            f'<span style="color: #2A4365;">{explanation}</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )

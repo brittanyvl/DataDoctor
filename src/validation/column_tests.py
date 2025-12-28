@@ -190,7 +190,10 @@ def test_range(
             continue
 
         try:
-            num_value = float(str(value).replace(",", "").replace("$", ""))
+            # Strip common numeric punctuation for validation (%, $, commas)
+            # This allows validation of "15%" as 15, "$100" as 100, etc.
+            clean_value = str(value).replace(",", "").replace("$", "").replace("%", "")
+            num_value = float(clean_value)
 
             if min_val is not None and num_value < min_val:
                 failed_indices.append(idx)

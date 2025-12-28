@@ -21,7 +21,6 @@ def generate_html_report(
     filename: str,
     contract_id: str,
     remediation_diff: Optional[RemediationDiff] = None,
-    max_failed_examples: int = 50,
 ) -> str:
     """
     Generate an HTML data quality report.
@@ -31,7 +30,6 @@ def generate_html_report(
         filename: Original dataset filename
         contract_id: Contract ID
         remediation_diff: Optional remediation diff if remediation was applied
-        max_failed_examples: Maximum number of failed examples to include
 
     Returns:
         HTML report as string
@@ -67,9 +65,9 @@ def generate_html_report(
         "is_valid": validation_result.is_valid,
     }
 
-    # Prepare failed examples
+    # Prepare ALL failed examples (no limit)
     failed_examples = []
-    for cell_error in validation_result.cell_errors[:max_failed_examples]:
+    for cell_error in validation_result.cell_errors:
         failed_examples.append({
             "row_index": cell_error.row_index,
             "column_name": cell_error.column_name,
@@ -81,11 +79,25 @@ def generate_html_report(
     # Prepare data cleansing summary if available
     cleansing_summary = None
     if remediation_diff:
-        # Build per-column statistics and sample changes (up to 20 per column)
+        # Build per-column statistics and changes
+        # Logic:
+        #   - Under 1000 rows: show ALL changes
+        #   - 1000+ rows: cap at 100 changes per column
         column_stats = []
         sample_changes_by_column = {}
+        total_rows = remediation_diff.total_rows
+
+        # Determine limit per column based on dataset size
+        if total_rows < 1000:
+            per_column_limit = None  # No limit - show all
+        else:
+            per_column_limit = 100  # Cap at 100 per column
 
         for col_name, col_diff in remediation_diff.column_diffs.items():
+            # Get treatments applied to this column
+            treatments = col_diff.treatments_applied if col_diff.treatments_applied else []
+            treatments_str = ", ".join(treatments) if treatments else "N/A"
+
             # Filter out null-to-null changes
             real_changes = []
             for change in col_diff.sample_changes:
@@ -96,6 +108,7 @@ def generate_html_report(
                     "column_name": change.column_name,
                     "original_value": _format_value(change.original_value),
                     "new_value": _format_value(change.new_value),
+                    "treatments": treatments_str,
                 })
 
             # Only include columns with actual changes
@@ -103,11 +116,17 @@ def generate_html_report(
                 column_stats.append({
                     "column_name": col_name,
                     "cells_changed": col_diff.changed_count,
+                    "treatments": treatments_str,
                 })
 
-                # Store up to 20 sample changes per column
+                # Apply limit based on dataset size
                 if real_changes:
-                    sample_changes_by_column[col_name] = real_changes[:20]
+                    if per_column_limit is None:
+                        # Under 1000 rows: show all changes
+                        sample_changes_by_column[col_name] = real_changes
+                    else:
+                        # 1000+ rows: cap at 100 per column
+                        sample_changes_by_column[col_name] = real_changes[:per_column_limit]
 
         cleansing_summary = {
             "rows_changed": remediation_diff.rows_changed,
