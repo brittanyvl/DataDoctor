@@ -10,6 +10,8 @@ import pandas as pd
 
 from src.constants import (
     DATA_TYPES,
+    DATA_TYPE_LABELS,
+    DATA_TYPE_FROM_LABEL,
     FAILURE_ACTION_LABELS,
     FAILURE_LABEL_TO_ACTION,
 )
@@ -21,9 +23,7 @@ from src.contract.builder import (
 from src.contract.validator import validate_contract, format_validation_errors
 from src.contract.schema import (
     FailureHandling,
-    Normalization,
     TestConfig,
-    RemediationConfig,
 )
 from src.presets.patterns import (
     get_all_pattern_display_names,
@@ -49,16 +49,12 @@ from src.ui.components import (
     navigation_buttons,
 )
 
-# Characters removed by "Remove special characters" remediation
-SPECIAL_CHARS_REMOVED = "Control characters (ASCII 0-31), null bytes, backspace, form feed, vertical tab, and other non-printable characters"
-
-
 def render_step_contract():
     """Render the contract configuration step."""
     step_header(
         2,
-        "Configure Validation Rules",
-        "Define validation tests and remediation rules for each column.",
+        "Create Rules",
+        "Define validation tests and data quality rules for each column.",
     )
 
     # Check if we have a dataframe
@@ -113,7 +109,7 @@ def render_step_contract():
     st.divider()
     back_clicked, next_clicked = navigation_buttons(
         back_label="Back to Upload",
-        next_label="Run Validation",
+        next_label="Configure Data Cleaning",
     )
 
     if back_clicked:
@@ -208,25 +204,21 @@ def _render_column_preview_table(df, col_name):
 def _render_single_column_config(contract, df, col_name, col_config):
     """Render configuration for a single column."""
     # Preview table at top of section
-    st.markdown("##### Sample Data")
+    st.markdown(f"##### {col_name} Sample Data")
     _render_column_preview_table(df, col_name)
 
-    # Statistics row
+    # Statistics row - bold black text
     col_data = df[col_name]
-    stat_cols = st.columns(4)
+    stat_cols = st.columns(3)
     with stat_cols[0]:
-        st.caption(f"Non-null: {col_data.notna().sum():,}")
+        st.markdown(f"**Non-null:** {col_data.notna().sum():,}")
     with stat_cols[1]:
-        st.caption(f"Null: {col_data.isna().sum():,}")
+        st.markdown(f"**Null:** {col_data.isna().sum():,}")
     with stat_cols[2]:
-        st.caption(f"Unique: {col_data.nunique():,}")
-    with stat_cols[3]:
-        st.caption(f"Inferred: {str(col_data.dtype)[:10]}")
-
-    st.divider()
+        st.markdown(f"**Unique:** {col_data.nunique():,}")
 
     # Column Settings - adjusted column widths (1:2:3 ratio)
-    st.markdown("##### Column Settings")
+    st.markdown(f"##### {col_name} Column Settings")
     settings_cols = st.columns([1, 2, 3])
 
     with settings_cols[0]:
@@ -238,14 +230,20 @@ def _render_single_column_config(contract, df, col_name, col_config):
         )
 
     with settings_cols[1]:
-        current_type_idx = DATA_TYPES.index(col_config.data_type) if col_config.data_type in DATA_TYPES else 0
-        data_type = st.selectbox(
+        # Use display labels for data types
+        type_labels = list(DATA_TYPE_LABELS.values())
+        current_label = DATA_TYPE_LABELS.get(col_config.data_type, type_labels[0])
+        current_type_idx = type_labels.index(current_label) if current_label in type_labels else 0
+
+        selected_label = st.selectbox(
             "Data Type",
-            options=DATA_TYPES,
+            options=type_labels,
             index=current_type_idx,
             key=f"dtype_{col_name}",
             label_visibility="collapsed",
         )
+        # Convert back to internal data type
+        data_type = DATA_TYPE_FROM_LABEL.get(selected_label, "text")
 
     with settings_cols[2]:
         failure_labels = list(FAILURE_ACTION_LABELS.values())
@@ -271,17 +269,9 @@ def _render_single_column_config(contract, df, col_name, col_config):
             label_column_name="__data_doctor_errors__" if failure_action == "label_failure" else None,
         )
 
-    st.divider()
-
     # Validation Rules - no expander, just section
-    st.markdown("##### Validation Rules")
+    st.markdown(f"##### {col_name} Validation Rules")
     _render_validation_rules(contract, col_config, col_name, data_type)
-
-    st.divider()
-
-    # Formatting/Remediation - no expander
-    st.markdown("##### Formatting (Remediation)")
-    _render_remediation_options(contract, col_config, col_name, data_type)
 
 
 def _render_validation_rules(contract, col_config, col_name, data_type):
@@ -323,8 +313,8 @@ def _render_validation_rules(contract, col_config, col_name, data_type):
     # Data type specific rules
     if data_type in ["integer", "float"]:
         _render_numeric_rules(col_config, col_name, existing_tests)
-    elif data_type == "string":
-        _render_string_rules(col_config, col_name, existing_tests)
+    elif data_type == "text":
+        _render_text_rules(col_config, col_name, existing_tests)
     elif data_type == "date":
         _render_date_rules(col_config, col_name, existing_tests)
     elif data_type == "timestamp":
@@ -471,8 +461,8 @@ def _render_numeric_rules(col_config, col_name, existing_tests):
         col_config.tests = [t for t in col_config.tests if t.type != "monotonic"]
 
 
-def _render_string_rules(col_config, col_name, existing_tests):
-    """Render rules specific to string types."""
+def _render_text_rules(col_config, col_name, existing_tests):
+    """Render rules specific to text types."""
     st.markdown("**Text Options:**")
 
     str_cols = st.columns(2)
@@ -616,7 +606,23 @@ def _render_date_rules(col_config, col_name, existing_tests):
         # Show example
         st.caption(f"Example: {_get_date_example(selected_format)}")
 
-        params = {"target_format": selected_format, "mode": "robust"}
+        # Default accepted input formats for robust mode
+        default_formats = [
+            "YYYY-MM-DD",
+            "MM/DD/YYYY",
+            "DD/MM/YYYY",
+            "YYYY/MM/DD",
+            "MM-DD-YYYY",
+            "DD-MM-YYYY",
+            "M/D/YYYY",
+            "D/M/YYYY",
+        ]
+
+        params = {
+            "target_format": selected_format,
+            "mode": "robust",
+            "accepted_input_formats": default_formats,
+        }
 
         # Update or add test
         existing = next((t for t in col_config.tests if t.type == "date_rule"), None)
@@ -740,221 +746,291 @@ def _render_boolean_rules(col_config, col_name, existing_tests):
     st.caption(f"Selected format: {bool_format}")
 
 
-def _render_remediation_options(contract, col_config, col_name, data_type):
-    """Render remediation/formatting options."""
-    # Track existing remediation
-    existing_rems = {r.type: r for r in col_config.remediation}
-
-    rem_cols = st.columns(2)
-
-    with rem_cols[0]:
-        # Trim whitespace
-        has_trim = "trim_whitespace" in existing_rems
-        trim_check = st.checkbox(
-            "Trim whitespace",
-            value=has_trim,
-            key=f"rem_trim_{col_name}",
-            help="Remove leading/trailing spaces",
-        )
-        _toggle_remediation(col_config, "trim_whitespace", trim_check, existing_rems)
-
-    with rem_cols[1]:
-        # Remove non-printable with detailed tooltip
-        has_nonprint = "remove_non_printable" in existing_rems
-        nonprint_check = st.checkbox(
-            "Remove special characters",
-            value=has_nonprint,
-            key=f"rem_nonprint_{col_name}",
-            help=f"Removes: {SPECIAL_CHARS_REMOVED}",
-        )
-        _toggle_remediation(col_config, "remove_non_printable", nonprint_check, existing_rems)
-
-    # Normalize case as dropdown (not checkbox + dropdown)
-    st.markdown("**Text Case:**")
-    case_options = ["As Entered (no change)", "lowercase", "UPPERCASE", "Title Case"]
-    case_map = {"As Entered (no change)": None, "lowercase": "lower", "UPPERCASE": "upper", "Title Case": "title"}
-    case_reverse = {v: k for k, v in case_map.items()}
-
-    # Get current case setting
-    has_case = "normalize_case" in existing_rems
-    current_case = None
-    if has_case:
-        current_case = existing_rems["normalize_case"].params.get("case")
-    current_display = case_reverse.get(current_case, "As Entered (no change)")
-    current_idx = case_options.index(current_display) if current_display in case_options else 0
-
-    case_selection = st.selectbox(
-        "Convert text to",
-        options=case_options,
-        index=current_idx,
-        key=f"rem_case_{col_name}",
-        label_visibility="collapsed",
-    )
-
-    selected_case = case_map[case_selection]
-    if selected_case:
-        # Add or update normalize_case remediation
-        existing = next((r for r in col_config.remediation if r.type == "normalize_case"), None)
-        if existing:
-            existing.params = {"case": selected_case}
-        else:
-            col_config.remediation.append(RemediationConfig(type="normalize_case", params={"case": selected_case}))
-    else:
-        # Remove normalize_case if "As Entered" selected
-        col_config.remediation = [r for r in col_config.remediation if r.type != "normalize_case"]
-
-    # Data type specific remediation
-    if data_type == "date":
-        has_date_coerce = "date_coerce" in existing_rems
-        date_coerce_check = st.checkbox(
-            "Standardize date format",
-            value=has_date_coerce,
-            key=f"rem_date_{col_name}",
-        )
-
-        if date_coerce_check:
-            target_format = st.selectbox(
-                "Target format",
-                options=get_common_format_names(),
-                key=f"rem_date_fmt_{col_name}",
-            )
-            params = {"target_format": target_format}
-
-            existing = next((r for r in col_config.remediation if r.type == "date_coerce"), None)
-            if existing:
-                existing.params = params
-            else:
-                col_config.remediation.append(RemediationConfig(type="date_coerce", params=params))
-        elif has_date_coerce and not date_coerce_check:
-            col_config.remediation = [r for r in col_config.remediation if r.type != "date_coerce"]
-
-    elif data_type in ["integer", "float"]:
-        has_numeric = "numeric_cleanup" in existing_rems
-        numeric_check = st.checkbox(
-            "Clean numeric formatting",
-            value=has_numeric,
-            key=f"rem_numeric_{col_name}",
-            help="Remove currency symbols, commas, etc.",
-        )
-        _toggle_remediation(col_config, "numeric_cleanup", numeric_check, existing_rems)
-
-    elif data_type == "boolean":
-        has_bool_norm = "boolean_normalization" in existing_rems
-        bool_check = st.checkbox(
-            "Standardize to true/false",
-            value=has_bool_norm,
-            key=f"rem_bool_{col_name}",
-        )
-        _toggle_remediation(col_config, "boolean_normalization", bool_check, existing_rems)
-
-
-def _toggle_remediation(col_config, rem_type, enabled, existing_rems):
-    """Toggle a simple remediation on or off."""
-    has_rem = rem_type in existing_rems
-
-    if enabled and not has_rem:
-        col_config.remediation.append(RemediationConfig(type=rem_type, params={}))
-    elif not enabled and has_rem:
-        col_config.remediation = [r for r in col_config.remediation if r.type != rem_type]
-
-
 def _render_dataset_tests(contract, df, columns_to_configure):
     """Render dataset-level tests configuration."""
+    st.markdown("## Dataset Tests")
     st.markdown("Add tests that validate the entire dataset.")
 
-    # Show existing
-    if contract.dataset_tests:
+    # Show existing dataset tests (excluding cross_field_rule which has its own section)
+    non_xf_tests = [t for t in contract.dataset_tests if t.type != "cross_field_rule"]
+    if non_xf_tests:
         st.markdown("**Current dataset tests:**")
         for i, test in enumerate(contract.dataset_tests):
+            if test.type == "cross_field_rule":
+                continue
             col1, col2 = st.columns([4, 1])
             with col1:
-                st.markdown(f"- **{test.type}** ({test.severity})")
+                failure_action = test.on_fail.action if test.on_fail else "label_failure"
+                st.markdown(f"- **{test.type}** → {FAILURE_ACTION_LABELS.get(failure_action, failure_action)}")
             with col2:
                 if st.button("Remove", key=f"rm_ds_test_{i}"):
                     contract.dataset_tests.pop(i)
                     st.rerun()
         st.divider()
 
-    # Checkbox-based dataset tests
-    st.markdown("**Add dataset tests:**")
+    # Duplicate row check - checkbox and dropdown in one row
+    dup_cols = st.columns([1, 2])
 
-    # Duplicate row check
-    dup_check = st.checkbox(
-        "Check for duplicate rows",
-        key="ds_dup_check",
-        help="Flag rows that are exact duplicates of other rows",
-    )
+    with dup_cols[0]:
+        dup_check = st.checkbox(
+            "Check for duplicate rows",
+            key="ds_dup_check",
+            help="Flag rows that are exact duplicates of other rows",
+        )
+
+    with dup_cols[1]:
+        if dup_check:
+            # Get current failure action if exists
+            existing_dup = next((t for t in contract.dataset_tests if t.type == "duplicate_rows"), None)
+            current_action = existing_dup.on_fail.action if existing_dup and existing_dup.on_fail else "label_failure"
+            current_label = FAILURE_ACTION_LABELS.get(current_action, list(FAILURE_ACTION_LABELS.values())[2])
+            failure_labels = list(FAILURE_ACTION_LABELS.values())
+            current_idx = failure_labels.index(current_label) if current_label in failure_labels else 2
+
+            dup_failure_label = st.selectbox(
+                "On Failure",
+                options=failure_labels,
+                index=current_idx,
+                key="ds_dup_failure",
+                label_visibility="collapsed",
+            )
+            dup_failure_action = FAILURE_LABEL_TO_ACTION.get(dup_failure_label, "label_failure")
 
     if dup_check:
-        if not any(t.type == "duplicate_rows" for t in contract.dataset_tests):
+        existing_dup = next((t for t in contract.dataset_tests if t.type == "duplicate_rows"), None)
+        if existing_dup:
+            existing_dup.on_fail = FailureHandling(
+                action=dup_failure_action,
+                label_column_name="__data_doctor_errors__" if dup_failure_action == "label_failure" else None,
+            )
+        else:
             from src.contract.schema import DatasetTest
-            contract.dataset_tests.append(DatasetTest(type="duplicate_rows", severity="error"))
+            contract.dataset_tests.append(DatasetTest(
+                type="duplicate_rows",
+                severity="error",
+                on_fail=FailureHandling(
+                    action=dup_failure_action,
+                    label_column_name="__data_doctor_errors__" if dup_failure_action == "label_failure" else None,
+                ),
+            ))
     else:
         contract.dataset_tests = [t for t in contract.dataset_tests if t.type != "duplicate_rows"]
 
-    # Primary key check
-    pk_check = st.checkbox(
-        "Primary key uniqueness",
-        key="ds_pk_check",
-        help="Ensure selected column(s) uniquely identify each row",
+    st.caption("For column uniqueness rules (like primary keys), use the 'Must be unique' option in Column Rules.")
+
+    st.divider()
+
+    # Cross-field rules section
+    _render_cross_field_rules(contract, df, columns_to_configure)
+
+
+def _render_cross_field_rules(contract, df, columns_to_configure):
+    """Render cross-field validation rules with expression builder."""
+    st.markdown("## Cross-Field Validation")
+    st.markdown("Create rules that validate relationships between columns.")
+    st.caption("Example: Ensure end_date is after start_date, or total equals quantity × price.")
+
+    # Show existing cross-field rules
+    xf_rules = [t for t in contract.dataset_tests if t.type == "cross_field_rule"]
+    if xf_rules:
+        st.markdown("**Current Cross-Field Rules:**")
+        for i, test in enumerate(contract.dataset_tests):
+            if test.type != "cross_field_rule":
+                continue
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                rule_name = test.params.get("rule_name", "Unnamed")
+                expression = test.params.get("assert", {}).get("expression", "")
+                failure_action = test.on_fail.action if test.on_fail else "label_failure"
+                st.markdown(f"**{rule_name}**: `{expression}` → {FAILURE_ACTION_LABELS.get(failure_action, failure_action)}")
+            with col2:
+                if st.button("Remove", key=f"rm_xf_{i}"):
+                    contract.dataset_tests.pop(i)
+                    st.rerun()
+        st.divider()
+
+    # Add new rule section
+    st.markdown("**Add New Rule:**")
+
+    # Rule name
+    rule_name = st.text_input(
+        "Rule Name",
+        value="",
+        key="xf_rule_name",
+        placeholder="e.g., end_after_start, total_calculation",
     )
 
-    if pk_check:
-        pk_columns = st.multiselect(
-            "Select key column(s)",
-            options=columns_to_configure,
-            key="ds_pk_cols",
-        )
+    # Initialize expression parts in session state
+    if "xf_expression_parts" not in st.session_state:
+        st.session_state["xf_expression_parts"] = [{"field1": None, "operator": None, "field2": None}]
 
-        if pk_columns:
-            test_type = "composite_key_uniqueness" if len(pk_columns) > 1 else "primary_key_uniqueness"
+    st.markdown("**Build Expression:**")
 
-            existing = next((t for t in contract.dataset_tests if t.type in ["primary_key_uniqueness", "composite_key_uniqueness"]), None)
-            if existing:
-                existing.type = test_type
-                existing.params = {"key_columns": pk_columns}
+    # Column options with custom value option
+    column_options = ["-- Select Column --"] + list(columns_to_configure) + ["Custom Value"]
+
+    # Operators - including user-friendly date operators
+    operators = [
+        "= (equals)",
+        "!= (not equal)",
+        "> (greater than)",
+        ">= (greater or equal)",
+        "< (less than)",
+        "<= (less or equal)",
+        "after (date is after)",
+        "before (date is before)",
+        "+ (add)",
+        "- (subtract)",
+        "* (multiply)",
+        "/ (divide)",
+        "% (remainder)",
+    ]
+
+    # Map display operators to actual operators for expression
+    OPERATOR_MAP = {
+        "= (equals)": "=",
+        "!= (not equal)": "!=",
+        "> (greater than)": ">",
+        ">= (greater or equal)": ">=",
+        "< (less than)": "<",
+        "<= (less or equal)": "<=",
+        "after (date is after)": ">",  # after means date1 > date2
+        "before (date is before)": "<",  # before means date1 < date2
+        "+ (add)": "+",
+        "- (subtract)": "-",
+        "* (multiply)": "*",
+        "/ (divide)": "/",
+        "% (remainder)": "%",
+    }
+
+    # Render each expression part
+    expression_parts = st.session_state["xf_expression_parts"]
+
+    for idx, part in enumerate(expression_parts):
+        st.markdown(f"**Condition {idx + 1}:**")
+        cols = st.columns([3, 2, 3])
+
+        with cols[0]:
+            field1_selection = st.selectbox(
+                "Field 1",
+                options=column_options,
+                key=f"xf_field1_{idx}",
+                label_visibility="collapsed",
+            )
+
+            # If Custom Value selected, show text input
+            if field1_selection == "Custom Value":
+                field1_value = st.text_input(
+                    "Custom value",
+                    key=f"xf_field1_custom_{idx}",
+                    placeholder="Enter value",
+                )
             else:
-                from src.contract.schema import DatasetTest
-                contract.dataset_tests.append(DatasetTest(
-                    type=test_type,
-                    severity="error",
-                    params={"key_columns": pk_columns}
-                ))
-    else:
-        contract.dataset_tests = [t for t in contract.dataset_tests if t.type not in ["primary_key_uniqueness", "composite_key_uniqueness"]]
+                field1_value = field1_selection if field1_selection != "-- Select Column --" else None
 
-    # Cross-field rule
-    xf_check = st.checkbox(
-        "Cross-field validation",
-        key="ds_xf_check",
-        help="Validate relationships between columns (e.g., start_date <= end_date)",
+        with cols[1]:
+            operator_display = st.selectbox(
+                "Operator",
+                options=operators,
+                key=f"xf_operator_{idx}",
+                label_visibility="collapsed",
+            )
+            # Convert display operator to actual operator
+            operator = OPERATOR_MAP.get(operator_display, operator_display)
+
+        with cols[2]:
+            field2_selection = st.selectbox(
+                "Field 2",
+                options=column_options,
+                key=f"xf_field2_{idx}",
+                label_visibility="collapsed",
+            )
+
+            # If Custom Value selected, show text input
+            if field2_selection == "Custom Value":
+                field2_value = st.text_input(
+                    "Custom value",
+                    key=f"xf_field2_custom_{idx}",
+                    placeholder="Enter value",
+                )
+            else:
+                field2_value = field2_selection if field2_selection != "-- Select Column --" else None
+
+        # Store values (with actual operator, not display)
+        expression_parts[idx] = {
+            "field1": field1_value,
+            "operator": operator,
+            "field2": field2_value,
+        }
+
+    # Add condition button
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        if st.button("+ Add Condition", key="xf_add_condition"):
+            st.session_state["xf_expression_parts"].append({"field1": None, "operator": None, "field2": None})
+            st.rerun()
+
+    # Build expression preview
+    expression_str = _build_expression_string(expression_parts)
+    if expression_str:
+        st.markdown(f"**Expression Preview:** `{expression_str}`")
+
+    st.divider()
+
+    # Failure handling
+    st.markdown("**On Failure:**")
+    failure_labels = list(FAILURE_ACTION_LABELS.values())
+    failure_label = st.selectbox(
+        "Action when rule fails",
+        options=failure_labels,
+        index=2,  # Default to "Label Failure"
+        key="xf_failure_action",
+        label_visibility="collapsed",
     )
+    failure_action = FAILURE_LABEL_TO_ACTION.get(failure_label, "label_failure")
 
-    if xf_check:
-        st.text_input(
-            "Rule name",
-            value="my_rule",
-            key="ds_xf_name",
-        )
-        expression = st.text_input(
-            "Expression",
-            key="ds_xf_expr",
-            help="Example: start_date <= end_date",
-        )
+    # Add rule button
+    if st.button("Add Rule", type="primary", key="xf_add_rule"):
+        if not rule_name:
+            error_box("Please enter a rule name.")
+        elif not expression_str:
+            error_box("Please build a valid expression.")
+        else:
+            from src.contract.schema import DatasetTest
+            new_test = DatasetTest(
+                type="cross_field_rule",
+                severity="error",
+                params={
+                    "rule_name": rule_name,
+                    "assert": {"expression": expression_str}
+                },
+                on_fail=FailureHandling(
+                    action=failure_action,
+                    label_column_name="__data_doctor_errors__" if failure_action == "label_failure" else None,
+                ),
+            )
+            contract.dataset_tests.append(new_test)
+            st.session_state["contract"] = contract
+            # Reset the expression builder
+            st.session_state["xf_expression_parts"] = [{"field1": None, "operator": None, "field2": None}]
+            success_box(f"Added rule: {rule_name}")
+            st.rerun()
 
-        if expression:
-            existing = next((t for t in contract.dataset_tests if t.type == "cross_field_rule"), None)
-            if existing:
-                existing.params = {"rule_name": st.session_state.get("ds_xf_name", "my_rule"), "assert": {"expression": expression}}
-            else:
-                from src.contract.schema import DatasetTest
-                contract.dataset_tests.append(DatasetTest(
-                    type="cross_field_rule",
-                    severity="error",
-                    params={"rule_name": st.session_state.get("ds_xf_name", "my_rule"), "assert": {"expression": expression}}
-                ))
-    else:
-        contract.dataset_tests = [t for t in contract.dataset_tests if t.type != "cross_field_rule"]
+
+def _build_expression_string(expression_parts):
+    """Build an expression string from parts."""
+    parts = []
+    for part in expression_parts:
+        field1 = part.get("field1")
+        operator = part.get("operator")
+        field2 = part.get("field2")
+
+        if field1 and operator and field2:
+            parts.append(f"{field1} {operator} {field2}")
+
+    if parts:
+        return " AND ".join(parts)
+    return ""
 
 
 def _render_fk_checks(contract, df, columns_to_configure):

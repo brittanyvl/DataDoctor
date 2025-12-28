@@ -68,8 +68,8 @@ def build_contract_from_dataframe(
         if str(col_name) in ignored_set:
             continue
 
-        # Infer data type from pandas dtype
-        inferred_type = infer_data_type(df[col_name])
+        # Infer data type from pandas dtype and column name
+        inferred_type = infer_data_type(df[col_name], str(col_name))
 
         columns.append(
             ColumnConfig(
@@ -101,7 +101,7 @@ def build_contract_from_dataframe(
         ),
         dataset=DatasetConfig(
             row_limit_behavior=RowLimitBehavior(reject_if_over_limit=True),
-            input_file_name=filename,
+            contract_basis_filename=filename,
             sheet_name=sheet_name,
             import_settings=import_settings or ImportSettings(),
         ),
@@ -146,21 +146,28 @@ def build_import_settings_from_session(session_state: dict) -> ImportSettings:
     )
 
 
-def infer_data_type(series: pd.Series) -> str:
+def infer_data_type(series: pd.Series, column_name: str = "") -> str:
     """
     Infer the data type for a pandas Series.
 
     Args:
         series: The pandas Series to analyze
+        column_name: Optional column name to help infer type
 
     Returns:
-        Inferred data type string
+        Inferred data type string (text, boolean, integer, float, date, timestamp)
     """
+    # Check if column name contains "date" (case insensitive)
+    # This is a strong hint that the column should be treated as a date
+    col_name_lower = column_name.lower()
+    if "date" in col_name_lower:
+        return "date"
+
     # Get non-null values
     non_null = series.dropna()
 
     if len(non_null) == 0:
-        return "string"
+        return "text"
 
     # Check the pandas dtype first
     dtype_str = str(series.dtype)
@@ -176,10 +183,10 @@ def infer_data_type(series: pd.Series) -> str:
 
     # For object dtype, try to infer from values
     if series.dtype == object:
-        # Sample values for type inference
-        sample = non_null.head(100)
+        # Sample up to 20 values for type inference (per user request)
+        sample = non_null.head(20)
 
-        # Try to detect booleans
+        # Try to detect booleans first (use 20 rows)
         if _looks_like_boolean(sample):
             return "boolean"
 
@@ -195,7 +202,7 @@ def infer_data_type(series: pd.Series) -> str:
         if _looks_like_date(sample):
             return "date"
 
-    return "string"
+    return "text"
 
 
 def _looks_like_boolean(series: pd.Series) -> bool:

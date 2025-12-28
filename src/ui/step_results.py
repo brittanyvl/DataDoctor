@@ -1,5 +1,5 @@
 """
-Step 3: Validation Results.
+Step 4: Validation Results.
 
 This module implements the validation results step of the Data Doctor workflow,
 including dataset summary and remediation options.
@@ -33,9 +33,9 @@ from src.validation.engine import (
 def render_step_results():
     """Render the validation results step."""
     step_header(
-        3,
-        "Validation Results",
-        "Review data quality summary, validation results, and apply remediation.",
+        4,
+        "Diagnostic Findings",
+        "Review data quality summary and diagnostic findings.",
     )
 
     # Check prerequisites
@@ -63,25 +63,27 @@ def render_step_results():
     _display_column_results(validation_result)
     _display_failed_examples(validation_result)
 
-    # Remediation section
-    st.divider()
-    _render_remediation_section(df, contract, validation_result)
+    # Auto-apply remediation if configured in Data Cleaning step
+    _auto_apply_remediation(df, contract)
 
     # Navigation
     st.divider()
     back_clicked, next_clicked = navigation_buttons(
-        back_label="Back to Contract",
-        next_label="Continue to Export",
+        back_label="Back to Data Cleaning",
+        next_label="Download Results",
     )
 
     if back_clicked:
-        # Clear validation results when going back
+        # Clear validation and remediation results when going back
         st.session_state["validation_results"] = None
-        set_current_step(2)
+        st.session_state["remediated_dataframe"] = None
+        st.session_state["remediation_diff"] = None
+        st.session_state["remediation_approved"] = None
+        set_current_step(3)
         st.rerun()
 
     if next_clicked:
-        set_current_step(4)
+        set_current_step(5)
         st.rerun()
 
 
@@ -96,7 +98,7 @@ def _run_validation(df, contract):
     set_processing(True)
 
     try:
-        with st.spinner("Running validation..."):
+        with st.spinner("Running diagnostics..."):
             # Get FK dataframe if available
             fk_df = st.session_state.get("fk_dataframe")
 
@@ -155,21 +157,21 @@ def _display_data_summary(df):
 
 def _display_validation_summary(validation_result):
     """Display validation summary metrics."""
-    st.subheader("Validation Results")
+    st.subheader("Diagnostic Findings")
 
     summary = validation_result.summary
 
     # Status banner
     if validation_result.is_valid:
-        success_box("Validation passed - no blocking errors found.")
+        success_box("All checks passed - no blocking issues found.")
     else:
         if validation_result.blocking_errors:
             error_box(
-                f"Validation failed with {len(validation_result.blocking_errors)} blocking errors."
+                f"We found {len(validation_result.blocking_errors)} blocking issues that need attention."
             )
         else:
             warning_box(
-                f"Validation completed with {summary.total_errors} errors."
+                f"Diagnostics completed - {summary.total_errors} issues found."
             )
 
     # Metrics
@@ -279,78 +281,46 @@ def _display_failed_examples(validation_result):
                 )
 
 
-def _render_remediation_section(df, contract, validation_result):
-    """Render the remediation section."""
-    st.subheader("Remediation")
-
+def _auto_apply_remediation(df, contract):
+    """Automatically apply remediation based on Data Cleaning step configuration."""
     # Check if contract has any remediation configured
     has_remediation = any(
         col.remediation for col in contract.columns
     )
 
     if not has_remediation:
-        info_box(
-            "No remediation actions configured. "
-            "Add remediation rules in the Contract step to enable data cleaning."
-        )
-        return
+        return  # No cleaning configured
 
-    # Preview remediation
-    if st.button("Preview Remediation"):
-        with st.spinner("Generating preview..."):
-            preview = preview_remediation(df, contract)
+    # Check if already applied
+    if st.session_state.get("remediated_dataframe") is not None:
+        return  # Already applied
 
-        st.markdown(f"""
-        **Estimated Impact:**
-        - Sample size: {preview['sample_size']} rows
-        - Changes in sample: {preview['sample_changes']} cells
-        - Estimated total changes: {preview['estimated_total_changes']:,} cells
-        - Columns affected: {', '.join(preview['columns_affected']) or 'None'}
-        """)
+    # Auto-apply remediation
+    with st.spinner("Applying data cleaning..."):
+        remediated_df, diff = run_remediation(df, contract)
 
-    # Run remediation
-    remediated_df = st.session_state.get("remediated_dataframe")
+        st.session_state["remediated_dataframe"] = remediated_df
+        st.session_state["remediation_diff"] = diff
+        st.session_state["remediation_approved"] = True
 
-    if remediated_df is None:
-        st.markdown("---")
-        st.markdown("**Apply Remediation**")
-
-        warning_box(
-            "Remediation will create a cleaned copy of your data. "
-            "The original data is never modified."
+    # Show summary of cleaning applied
+    if diff and diff.cells_changed > 0:
+        st.divider()
+        st.subheader("Data Cleansing Applied")
+        success_box(
+            f"Cleaned {diff.cells_changed:,} cells across {diff.rows_changed:,} rows. "
+            f"Columns affected: {', '.join(diff.columns_affected) or 'None'}"
         )
 
-        if st.button("Apply Remediation", type="primary"):
-            with st.spinner("Applying remediation..."):
-                remediated_df, diff = run_remediation(df, contract)
-
-                st.session_state["remediated_dataframe"] = remediated_df
-                st.session_state["remediation_diff"] = diff
-                st.session_state["remediation_approved"] = True
-
-            success_box("Remediation applied successfully!")
-            st.rerun()
-    else:
-        success_box("Remediation has been applied.")
-
-        diff = st.session_state.get("remediation_diff")
-        if diff:
-            st.markdown(f"""
-            **Remediation Results:**
-            - Rows changed: {diff.rows_changed:,}
-            - Cells changed: {diff.cells_changed:,}
-            - Columns affected: {', '.join(diff.columns_affected)}
-            """)
-
-            # Show sample changes
-            with st.expander("View Sample Changes", expanded=False):
-                sample_df = get_sample_changes_table(diff, max_rows=20)
+        # Show sample changes (filter out null-to-null)
+        with st.expander("View Sample Changes", expanded=False):
+            sample_df = get_sample_changes_table(diff, max_rows=20)
+            if not sample_df.empty:
+                # Filter out rows where Original and New are both (null)
+                sample_df = sample_df[
+                    ~((sample_df["Original"] == "(null)") & (sample_df["New"] == "(null)"))
+                ]
                 if not sample_df.empty:
                     st.dataframe(sample_df, use_container_width=True, hide_index=True)
-
-        # Option to clear remediation
-        if st.button("Clear Remediation"):
-            st.session_state["remediated_dataframe"] = None
-            st.session_state["remediation_diff"] = None
-            st.session_state["remediation_approved"] = False
-            st.rerun()
+                else:
+                    st.caption("No changes to display.")

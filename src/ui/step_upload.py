@@ -80,7 +80,7 @@ def render_step_upload():
         st.divider()
         _, next_clicked = navigation_buttons(
             show_back=False,
-            next_label="Continue to Contract",
+            next_label="Select Data Tests",
             next_disabled=False,
         )
 
@@ -575,31 +575,9 @@ def _render_column_configuration():
     # Get current settings
     column_renames = st.session_state.get("column_renames", {col: col for col in df.columns})
 
-    # Import and transformation options as checkboxes
-    st.markdown("**Quick Options**")
-    st.caption("Column name transformations:")
+    # ===== ROW OPTIONS SECTION (first) =====
+    st.markdown("### Row Options")
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        to_lowercase = st.checkbox("Convert to lowercase", key="opt_lowercase")
-        to_uppercase = st.checkbox("Convert to UPPERCASE", key="opt_uppercase")
-    with col2:
-        to_titlecase = st.checkbox("Convert to Title Case", key="opt_titlecase")
-        trim_whitespace = st.checkbox("Trim whitespace", key="opt_trim")
-    with col3:
-        remove_punctuation = st.checkbox("Remove punctuation", key="opt_remove_punct")
-        replace_spaces = st.checkbox("Replace spaces with _", key="opt_replace_spaces")
-
-    st.caption("Row filtering:")
-    skip_total_rows = st.checkbox(
-        "Skip rows containing 'total'",
-        key="opt_skip_totals",
-        help="Remove rows where any cell contains 'total' or 'grand total' (case insensitive)"
-    )
-
-    # Skip rows options
-    st.markdown("**Row Options**")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -623,6 +601,40 @@ def _render_column_configuration():
             key="skip_footer_input",
         )
         st.session_state["skip_footer_rows"] = skip_footer
+
+    skip_total_rows = st.checkbox(
+        "Skip rows containing 'total'",
+        key="opt_skip_totals",
+        help="Remove rows where any cell contains 'total' or 'grand total' (case insensitive)"
+    )
+
+    st.divider()
+
+    # ===== COLUMN OPTIONS SECTION =====
+    st.markdown("### Column Options")
+
+    # Case conversion on its own line
+    case_options = ["No case change", "lowercase", "UPPERCASE", "Title Case"]
+    case_selection = st.selectbox(
+        "Case conversion",
+        options=case_options,
+        index=0,
+        key="opt_case",
+        help="Convert column names to a specific case",
+    )
+    to_lowercase = case_selection == "lowercase"
+    to_uppercase = case_selection == "UPPERCASE"
+    to_titlecase = case_selection == "Title Case"
+
+    # 4 checkboxes in 2x2 layout
+    col1, col2 = st.columns(2)
+
+    with col1:
+        trim_whitespace = st.checkbox("Trim whitespace", key="opt_trim")
+        remove_punctuation = st.checkbox("Remove punctuation", key="opt_remove_punct")
+
+    with col2:
+        replace_spaces = st.checkbox("Replace spaces with _", key="opt_replace_spaces")
 
     # Apply Changes button
     if st.button("Apply Changes", type="primary"):
@@ -657,9 +669,8 @@ def _render_column_configuration():
         # Increment version to force widget refresh
         st.session_state["column_config_version"] = st.session_state.get("column_config_version", 0) + 1
 
-        # Clear checkbox states after applying
-        for key in ["opt_lowercase", "opt_uppercase", "opt_titlecase", "opt_trim",
-                    "opt_remove_punct", "opt_replace_spaces", "opt_skip_totals"]:
+        # Clear option states after applying
+        for key in ["opt_case", "opt_trim", "opt_remove_punct", "opt_replace_spaces", "opt_skip_totals"]:
             if key in st.session_state:
                 del st.session_state[key]
 
@@ -676,11 +687,9 @@ def _render_column_configuration():
         success_box(st.session_state["apply_changes_message"])
         del st.session_state["apply_changes_message"]
 
-    st.markdown("---")
-
-    # Individual column names
-    st.markdown("**Column Names**")
-    st.caption(
+    # ===== FINALIZE COLUMN NAMES SECTION (no divider before) =====
+    st.markdown("### Finalize Column Names")
+    st.markdown(
         "Edit column names below. Check 'Ignore' to exclude columns from validation rules. "
         "Ignored columns will be hidden in previews and unavailable for rule configuration. "
         "You can choose to drop them entirely when exporting."
@@ -692,23 +701,23 @@ def _render_column_configuration():
     # Get current ignored columns set
     columns_to_ignore = st.session_state.get("columns_to_ignore", set())
 
-    # Header row
-    header_col1, header_col2, header_col3 = st.columns([0.5, 3, 0.5])
+    # Header row with bold Ignore Column header - wider ignore column
+    header_col1, header_col2, header_col3 = st.columns([0.2, 2.5, 1.3])
     with header_col1:
-        st.caption("#")
+        st.markdown("**#**")
     with header_col2:
-        st.caption("Column Name")
+        st.markdown("**Column Name**")
     with header_col3:
-        st.caption("Ignore")
+        st.markdown("**Ignore Column**")
 
     # Display columns with ignore checkbox
     for i, orig_col in enumerate(df.columns):
         current_name = column_renames.get(orig_col, orig_col)
 
-        col1, col2, col3 = st.columns([0.5, 3, 0.5])
+        col1, col2, col3 = st.columns([0.2, 2.5, 1.3])
 
         with col1:
-            st.markdown(f"**{i+1}**")
+            st.markdown(f"{i+1}")
 
         with col2:
             new_name = st.text_input(
@@ -723,15 +732,17 @@ def _render_column_configuration():
                 st.session_state["column_renames"] = column_renames
 
         with col3:
-            is_ignored = st.checkbox(
-                "Ignore",
-                value=orig_col in columns_to_ignore,
+            is_ignored = orig_col in columns_to_ignore
+            # Use checkbox with visible label that shows status
+            checkbox_label = "Ignored" if is_ignored else "Ignore"
+            new_ignored = st.checkbox(
+                checkbox_label,
+                value=is_ignored,
                 key=f"ignore_col_{i}_v{version}",
-                label_visibility="collapsed",
             )
 
             # Update ignored columns set
-            if is_ignored:
+            if new_ignored:
                 columns_to_ignore.add(orig_col)
             elif orig_col in columns_to_ignore:
                 columns_to_ignore.discard(orig_col)

@@ -8,6 +8,7 @@ configuration constants used throughout the Data Doctor application.
 # Application metadata
 APP_NAME = "Data Doctor"
 APP_VERSION = "0.1.0"
+APP_TAGLINE = "Spreadsheet diagnostics you can trust."
 CONTRACT_VERSION = "1.0"
 
 # File size and content limits (Section 5 of acceptance criteria)
@@ -38,7 +39,21 @@ CSV_ENCODING_FALLBACKS = ["utf-8-sig", "latin-1"]
 CSV_ENCODING_OPTIONS = ["utf-8", "utf-8-sig", "latin-1"]
 
 # Supported data types (Section 21.1.1)
-DATA_TYPES = ["string", "boolean", "integer", "float", "date", "timestamp"]
+# Using user-friendly names with technical names in parentheses
+DATA_TYPES = ["text", "boolean", "integer", "float", "date", "timestamp"]
+
+# Display labels for data types (for UI)
+DATA_TYPE_LABELS = {
+    "text": "Text (String)",
+    "boolean": "Boolean",
+    "integer": "Integer",
+    "float": "Decimal (Float)",
+    "date": "Date",
+    "timestamp": "Timestamp",
+}
+
+# Reverse mapping
+DATA_TYPE_FROM_LABEL = {v: k for k, v in DATA_TYPE_LABELS.items()}
 
 # Failure handling actions (Section 21.1.1)
 FAILURE_ACTIONS = [
@@ -122,6 +137,7 @@ REMEDIATION_TYPES = [
     "standardize_nulls",
     "normalize_case",
     "remove_non_printable",
+    "remove_punctuation",
     "deduplicate_rows",
     "numeric_cleanup",
     "boolean_normalization",
@@ -137,10 +153,15 @@ CASE_OPTIONS = ["none", "lower", "upper", "title"]
 # Cross-field comparison operators (Section 23.3)
 COMPARISON_OPERATORS = ["<", "<=", ">", ">=", "==", "!="]
 
-# UI step definitions (4-step workflow)
+# UI step definitions (5-step workflow)
 UI_STEPS = [
     {"number": 1, "name": "Upload", "description": "Upload dataset and configure columns"},
-    {"number": 2, "name": "Contract", "description": "Define schema, tests, and remediation"},
-    {"number": 3, "name": "Results", "description": "Review validation results"},
-    {"number": 4, "name": "Export", "description": "Export artifacts"},
+    {"number": 2, "name": "Rules", "description": "Define data quality rules"},
+    {"number": 3, "name": "Data Cleaning", "description": "Configure data cleaning options"},
+    {"number": 4, "name": "Findings", "description": "Review diagnostic findings"},
+    {"number": 5, "name": "Download", "description": "Download results"},
 ]
+
+# Characters removed by data cleaning options
+SPECIAL_CHARS_REMOVED = "Control characters (ASCII 0-31), null bytes, backspace, form feed, vertical tab, and other non-printable characters"
+PUNCTUATION_MARKS_REMOVED = "! \" # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _ ` { | } ~"

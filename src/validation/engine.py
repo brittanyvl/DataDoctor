@@ -388,30 +388,64 @@ def add_error_columns(
     result_df[ERROR_COUNT_COLUMN_NAME] = 0
     result_df[STATUS_COLUMN_NAME] = STATUS_PASS
 
-    # Group cell errors by row
-    row_errors: dict[int, list[str]] = {}
+    # Group cell errors by row, then by column
+    row_errors: dict[int, dict[str, list[str]]] = {}
 
     for cell_error in validation_result.cell_errors:
         idx = cell_error.row_index
+        col_name = cell_error.column_name
+
         if idx not in row_errors:
-            row_errors[idx] = []
+            row_errors[idx] = {}
+        if col_name not in row_errors[idx]:
+            row_errors[idx][col_name] = []
 
-        # Format error: test_type:detail
-        error_str = cell_error.test_type
-        if cell_error.error_message:
-            # Extract short detail
-            error_str += f":{cell_error.column_name}"
+        # Format error detail based on test type
+        error_detail = _format_error_detail(cell_error)
+        row_errors[idx][col_name].append(error_detail)
 
-        row_errors[idx].append(error_str)
-
-    # Apply to DataFrame
-    for idx, errors in row_errors.items():
+    # Apply to DataFrame with new format: [col1: error1, error2][col2: error3]
+    for idx, col_errors in row_errors.items():
         if idx in result_df.index:
-            result_df.at[idx, ERROR_COLUMN_NAME] = "|".join(errors)
-            result_df.at[idx, ERROR_COUNT_COLUMN_NAME] = len(errors)
+            error_parts = []
+            total_error_count = 0
+            for col_name, errors in col_errors.items():
+                total_error_count += len(errors)
+                error_list = ", ".join(errors)
+                error_parts.append(f"[{col_name}: {error_list}]")
+
+            result_df.at[idx, ERROR_COLUMN_NAME] = "".join(error_parts)
+            result_df.at[idx, ERROR_COUNT_COLUMN_NAME] = total_error_count
             result_df.at[idx, STATUS_COLUMN_NAME] = STATUS_FAIL
 
     return result_df
+
+
+def _format_error_detail(cell_error: CellValidationResult) -> str:
+    """Format a cell error into a descriptive string."""
+    test_type = cell_error.test_type
+
+    if test_type == "not_null":
+        return "value is null"
+    elif test_type == "type_conformance":
+        return "wrong data type"
+    elif test_type == "date_rule":
+        return "wrong date format"
+    elif test_type == "range":
+        return "out of range"
+    elif test_type == "length":
+        return "wrong length"
+    elif test_type == "enum":
+        return "not in allowed values"
+    elif test_type == "pattern":
+        return "does not match pattern"
+    elif test_type == "uniqueness":
+        return "duplicate value"
+    elif test_type == "date_window":
+        return "date out of window"
+    else:
+        # Fall back to test type name
+        return test_type.replace("_", " ")
 
 
 def get_rows_by_status(

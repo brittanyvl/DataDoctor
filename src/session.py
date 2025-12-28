@@ -124,12 +124,30 @@ def reset_from_step(step: int) -> None:
 
 def set_current_step(step: int) -> None:
     """
-    Set the current UI step.
+    Set the current UI step and mark that a navigation occurred.
 
     Args:
         step: Step number (1-6)
     """
-    st.session_state["current_step"] = max(1, min(6, step))
+    new_step = max(1, min(6, step))
+    old_step = st.session_state.get("current_step", 1)
+
+    # Mark that we're navigating to a different step
+    if new_step != old_step:
+        st.session_state["_step_changed"] = True
+
+    st.session_state["current_step"] = new_step
+
+
+def consume_step_change() -> bool:
+    """
+    Check if a step change occurred and clear the flag.
+
+    Returns:
+        True if the step changed since last check
+    """
+    changed = st.session_state.pop("_step_changed", False)
+    return changed
 
 
 def get_current_step() -> int:

@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Doctor - Data Quality Report</title>
+    <title>Data Doctor – Data Quality Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -12,9 +15,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #2D3748;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
@@ -29,15 +32,26 @@
         }
 
         .header {
-            border-bottom: 2px solid #1f77b4;
+            border-bottom: 2px solid #2F855A;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
 
         .header h1 {
-            color: #1f77b4;
+            color: #2D3748;
             font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header .tagline {
+            color: #2F855A;
+            font-size: 14px;
+            font-style: italic;
             margin-bottom: 10px;
+        }
+
+        code, pre {
+            font-family: 'JetBrains Mono', SFMono-Regular, Consolas, 'Liberation Mono', monospace;
         }
 
         .header .meta {
@@ -80,7 +94,7 @@
         .summary-card .value {
             font-size: 24px;
             font-weight: bold;
-            color: #1f77b4;
+            color: #2F855A;
         }
 
         .summary-card .label {
@@ -99,18 +113,18 @@
         }
 
         .status-pass {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #C6F6D5;
+            color: #22543D;
         }
 
         .status-fail {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #FED7D7;
+            color: #822727;
         }
 
         .status-warning {
-            background-color: #fff3cd;
-            color: #856404;
+            background-color: #FEFCBF;
+            color: #744210;
         }
 
         table {
@@ -127,9 +141,9 @@
         }
 
         th {
-            background-color: #f8f9fa;
+            background-color: #EDF2F7;
             font-weight: 600;
-            color: #333;
+            color: #2D3748;
         }
 
         tr:hover {
@@ -137,15 +151,15 @@
         }
 
         .column-status-good {
-            color: #28a745;
+            color: #2F855A;
         }
 
         .column-status-warning {
-            color: #ffc107;
+            color: #D69E2E;
         }
 
         .column-status-critical {
-            color: #dc3545;
+            color: #C53030;
         }
 
         .error-list {
@@ -203,16 +217,16 @@
 
         .progress-bar-fill {
             height: 100%;
-            background-color: #28a745;
+            background-color: #2F855A;
             transition: width 0.3s;
         }
 
         .progress-bar-fill.warning {
-            background-color: #ffc107;
+            background-color: #D69E2E;
         }
 
         .progress-bar-fill.danger {
-            background-color: #dc3545;
+            background-color: #C53030;
         }
 
         @media print {
@@ -230,7 +244,8 @@
 <body>
     <div class="report-container">
         <div class="header">
-            <h1>Data Quality Report</h1>
+            <h1>Data Doctor – Data Quality Report</h1>
+            <p class="tagline">Spreadsheet diagnostics you can trust.</p>
             <div class="meta">
                 <p><strong>File:</strong> {{ filename }}</p>
                 <p><strong>Generated:</strong> {{ generated_at }}</p>
@@ -239,7 +254,17 @@
         </div>
 
         <div class="section">
-            <h2>Validation Summary</h2>
+            <h2>Diagnostic Summary</h2>
+
+            <!-- Full-width status banner -->
+            <div style="margin-bottom: 20px; padding: 15px; border-radius: 6px; text-align: center; {% if summary.is_valid %}background-color: #C6F6D5; border: 1px solid #9AE6B4;{% else %}background-color: #FED7D7; border: 1px solid #FEB2B2;{% endif %}">
+                {% if summary.is_valid %}
+                <span class="status-badge status-pass" style="font-size: 16px; padding: 8px 24px;">PASS – All Checks Passed</span>
+                {% else %}
+                <span class="status-badge status-fail" style="font-size: 16px; padding: 8px 24px;">ISSUES FOUND – {{ summary.errors }} Issues Need Attention</span>
+                {% endif %}
+            </div>
+
             <div class="summary-grid">
                 <div class="summary-card">
                     <div class="value">{{ summary.total_rows | format_number }}</div>
@@ -262,14 +287,8 @@
                     <div class="label">Error Rate</div>
                 </div>
                 <div class="summary-card">
-                    <div class="value">
-                        {% if summary.is_valid %}
-                        <span class="status-badge status-pass">PASS</span>
-                        {% else %}
-                        <span class="status-badge status-fail">FAIL</span>
-                        {% endif %}
-                    </div>
-                    <div class="label">Overall Status</div>
+                    <div class="value">{{ summary.rows_with_errors | format_number }}</div>
+                    <div class="label">Rows with Errors</div>
                 </div>
             </div>
         </div>
@@ -417,43 +436,47 @@
         </div>
         {% endif %}
 
-        {% if remediation_summary %}
+        {% if cleansing_summary %}
         <div class="section">
-            <h2>Remediation Summary</h2>
+            <h2>Data Cleansing Summary</h2>
             <div class="remediation-summary">
-                <p><strong>Rows Changed:</strong> {{ remediation_summary.rows_changed | format_number }}</p>
-                <p><strong>Cells Changed:</strong> {{ remediation_summary.cells_changed | format_number }}</p>
-                <p><strong>Columns Affected:</strong> {{ remediation_summary.columns_affected | join(', ') }}</p>
+                <p><strong>Rows Changed:</strong> {{ cleansing_summary.rows_changed | format_number }}</p>
+                <p><strong>Cells Changed:</strong> {{ cleansing_summary.cells_changed | format_number }}</p>
+                <p><strong>Columns Affected:</strong> {{ cleansing_summary.columns_affected | join(', ') }}</p>
             </div>
 
-            {% if remediation_summary.sample_changes %}
+            {% if cleansing_summary.sample_changes %}
             <h3>Sample Changes</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Row</th>
                         <th>Column</th>
-                        <th>Original</th>
-                        <th>New</th>
+                        <th>Original Value</th>
+                        <th>New Value</th>
                     </tr>
                 </thead>
                 <tbody>
-                {% for change in remediation_summary.sample_changes %}
+                {% for change in cleansing_summary.sample_changes %}
                     <tr>
                         <td>{{ change.row_index }}</td>
                         <td>{{ change.column_name }}</td>
-                        <td>{{ change.original_value }}</td>
-                        <td>{{ change.new_value }}</td>
+                        <td><code>{{ change.original_value }}</code></td>
+                        <td><code>{{ change.new_value }}</code></td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+            {% elif cleansing_summary.has_cached_data_issue %}
+            <div class="warning-list">
+                <p><strong>Note:</strong> Sample changes could not be displayed. Please go back to Step 3 (Data Cleaning) and re-run the cleaning to see detailed changes.</p>
+            </div>
             {% endif %}
         </div>
         {% endif %}
 
         <div class="footer">
-            <p>Generated by Data Doctor v{{ app_version }}</p>
+            <p>Generated by Data Doctor v{{ app_version }} — Spreadsheet diagnostics you can trust.</p>
             <p>This report is for informational purposes. No data is stored by the application.</p>
         </div>
     </div>

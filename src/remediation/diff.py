@@ -74,12 +74,13 @@ def compute_diff(
         orig_col = original_df[col]
         new_col = remediated_df[col]
 
-        # Find changes
-        # Handle comparison with nulls
+        # Find changes - properly handle null-to-null (not a change)
+        # A change occurs when:
+        # 1. One value is null and the other is not, OR
+        # 2. Both values are not null but they are different
         changed_mask = (
-            (orig_col != new_col) |
-            (orig_col.isna() & new_col.notna()) |
-            (orig_col.notna() & new_col.isna())
+            (orig_col.isna() != new_col.isna()) |  # One null, other not
+            (orig_col.notna() & new_col.notna() & (orig_col != new_col))  # Both not null but different
         )
 
         changed_indices = orig_col.index[changed_mask].tolist()
@@ -270,11 +271,10 @@ def get_rows_with_changes(
                 orig_val = original_df.loc[idx, col]
                 new_val = remediated_df.loc[idx, col]
 
-                # Check if this specific cell changed
+                # Check if this specific cell changed (null-to-null is NOT a change)
                 changed = (
-                    orig_val != new_val or
-                    (pd.isna(orig_val) and pd.notna(new_val)) or
-                    (pd.notna(orig_val) and pd.isna(new_val))
+                    (pd.isna(orig_val) != pd.isna(new_val)) or  # One null, other not
+                    (pd.notna(orig_val) and pd.notna(new_val) and orig_val != new_val)  # Both not null but different
                 )
 
                 if changed:

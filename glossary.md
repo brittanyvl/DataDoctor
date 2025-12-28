@@ -19,13 +19,13 @@ A column with values `["TX", "CA", "TX", "NY"]` has a cardinality of **3**.
 ---
 
 ## Coerce
-**What it means:**  
+**What it means:**
 To **convert values into the expected type or format** when possible.
 
-**Why it matters:**  
+**Why it matters:**
 Coercion allows the system to fix common issues (e.g., turning `"1,200"` into `1200`) instead of failing immediately.
 
-**Example:**  
+**Example:**
 `"01/07/2025"` → `2025-01-07`
 
 ---
@@ -42,16 +42,33 @@ Sometimes no single column is unique, but a combination is.
 
 ---
 
+## Data Cleaning
+**What it means:**
+Automated transformations applied to data to fix formatting issues, standardize values, and remove unwanted characters.
+
+**Why it matters:**
+Data cleaning ensures consistent formatting across your dataset without manually editing each value.
+
+**Common data cleaning actions:**
+- Trim whitespace (remove leading/trailing spaces)
+- Normalize case (convert to lowercase, UPPERCASE, or Title Case)
+- Remove special characters (control characters, null bytes)
+- Remove punctuation marks
+- Standardize dates to a consistent format
+- Clean numeric formatting (remove currency symbols, commas)
+
+---
+
 ## Date Format
-**What it means:**  
+**What it means:**
 The specific way a date is written.
 
-**Why it matters:**  
+**Why it matters:**
 Dates like `01/07/25` can be ambiguous. Data Doctor requires you to explicitly state the expected format.
 
-**Examples:**  
-- `YYYY-MM-DD` → `2025-01-07`  
-- `MM/DD/YYYY` → `01/07/2025`  
+**Examples:**
+- `YYYY-MM-DD` → `2025-01-07`
+- `MM/DD/YYYY` → `01/07/2025`
 - `YYYYMMDD` → `20250107`
 
 ---
@@ -197,12 +214,26 @@ Useful when data must be perfect before use.
 ---
 
 ## Timestamp
-**What it means:**  
+**What it means:**
 A date **and time**, optionally including timezone information.
 
-**Examples:**  
+**Examples:**
 - `2025-01-07 14:32:10`
 - `2025-01-07T14:32:10Z`
+
+---
+
+## Text (String)
+**What it means:**
+A data type for storing textual values like names, descriptions, codes, and other character-based data.
+
+**Why it matters:**
+Text columns can contain any characters and are often validated using pattern matching, length limits, or approved value lists.
+
+**Examples:**
+- Names: `"John Smith"`
+- Codes: `"ABC123"`
+- Descriptions: `"This is a product description."`
 
 ---
 

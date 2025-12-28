@@ -67,7 +67,7 @@ class DatasetConfig:
     """Dataset configuration in the contract."""
 
     row_limit_behavior: RowLimitBehavior = field(default_factory=RowLimitBehavior)
-    input_file_name: Optional[str] = None
+    contract_basis_filename: Optional[str] = None
     sheet_name: Optional[str] = None
     header_row: int = 1
     delimiter: Optional[str] = None
@@ -361,7 +361,7 @@ def dict_to_contract(data: dict) -> Contract:
         row_limit_behavior=RowLimitBehavior(
             reject_if_over_limit=row_limit_data.get("reject_if_over_limit", True)
         ),
-        input_file_name=dataset_data.get("input_file_name"),
+        contract_basis_filename=dataset_data.get("contract_basis_filename"),
         sheet_name=dataset_data.get("sheet_name"),
         header_row=dataset_data.get("header_row", 1),
         delimiter=dataset_data.get("delimiter"),

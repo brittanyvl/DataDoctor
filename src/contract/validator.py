@@ -138,13 +138,15 @@ def _validate_columns(contract: Contract) -> list[ValidationError]:
     column_names = set()
 
     for i, col in enumerate(contract.columns):
-        col_prefix = f"columns[{i}]"
+        # Use column name in error messages for clarity
+        col_name = col.name if col.name else f"(unnamed column {i})"
+        col_prefix = f"columns['{col_name}']"
 
         # name is required
         if not col.name:
             errors.append(
                 ValidationError(
-                    field=f"{col_prefix}.name",
+                    field=f"columns[{i}].name",
                     message=f"Column {i} is missing a name.",
                     guidance="Each column must have a 'name' field.",
                 )

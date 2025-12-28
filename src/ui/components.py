@@ -10,6 +10,13 @@ from typing import Any, Callable, Optional
 import streamlit as st
 
 from src.ui.tooltips import get_tooltip
+from src.ui.theme import (
+    BRAND_GREEN,
+    BRAND_RED,
+    BRAND_AMBER,
+    BRAND_SLATE,
+    get_status_badge_html,
+)
 
 
 def info_tooltip(key: str) -> None:
@@ -30,7 +37,7 @@ def info_tooltip(key: str) -> None:
 
     st.markdown(
         f'<span title="{tooltip_content}" style="cursor: help; '
-        f'color: #666; font-size: 0.9em;">&#9432; {title}</span>',
+        f'color: {BRAND_SLATE}; font-size: 0.9em;">&#9432; {title}</span>',
         unsafe_allow_html=True,
     )
 
@@ -63,6 +70,55 @@ def get_help_text(tooltip_key: str) -> str:
     if example:
         return f"{explanation} Example: {example}"
     return explanation
+
+
+def scroll_to_top_after_render() -> None:
+    """
+    Scroll the page to the top AFTER all content has rendered.
+
+    This should be called at the END of the main app render, not the beginning.
+    It only triggers after a step navigation (not on every rerun).
+    """
+    import streamlit.components.v1 as components
+
+    # Use components.html at the END of the page to scroll after render
+    components.html(
+        """
+        <script>
+            function scrollToTop() {
+                const parent = window.parent;
+                const doc = parent.document;
+
+                // Scroll all possible containers
+                const containers = [
+                    doc.querySelector('[data-testid="stMain"]'),
+                    doc.querySelector('section.main'),
+                    doc.querySelector('[data-testid="stAppViewContainer"]'),
+                    doc.querySelector('[data-testid="stVerticalBlock"]'),
+                ];
+
+                containers.forEach(container => {
+                    if (container) {
+                        container.scrollTop = 0;
+                    }
+                });
+
+                // Also scroll the parent window
+                parent.scrollTo(0, 0);
+            }
+
+            // Execute after Streamlit has finished rendering
+            // Using requestAnimationFrame ensures we run after the current paint
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    scrollToTop();
+                });
+            });
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
 
 
 def step_header(step_number: int, title: str, description: str) -> None:
@@ -189,15 +245,17 @@ def navigation_buttons(
 
     with col1:
         if show_back:
-            if st.button(back_label, use_container_width=True):
+            # Add left arrow before back label
+            if st.button(f"← {back_label}", use_container_width=True):
                 back_clicked = True
                 if on_back:
                     on_back()
 
     with col3:
         if show_next:
+            # Add right arrow after next label
             if st.button(
-                next_label,
+                f"{next_label} →",
                 use_container_width=True,
                 disabled=next_disabled,
                 type="primary",
@@ -290,39 +348,13 @@ def confirm_action(
 
 def status_badge(status: str) -> None:
     """
-    Display a colored status badge.
+    Display a colored status badge using brand colors.
 
     Args:
         status: Status text (e.g., "PASS", "FAIL", "WARNING")
     """
-    if status.upper() == "PASS":
-        st.markdown(
-            '<span style="background-color: #28a745; color: white; '
-            'padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">'
-            f"{status}</span>",
-            unsafe_allow_html=True,
-        )
-    elif status.upper() == "FAIL":
-        st.markdown(
-            '<span style="background-color: #dc3545; color: white; '
-            'padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">'
-            f"{status}</span>",
-            unsafe_allow_html=True,
-        )
-    elif status.upper() == "WARNING":
-        st.markdown(
-            '<span style="background-color: #ffc107; color: black; '
-            'padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">'
-            f"{status}</span>",
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            '<span style="background-color: #6c757d; color: white; '
-            'padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">'
-            f"{status}</span>",
-            unsafe_allow_html=True,
-        )
+    badge_html = get_status_badge_html(status.lower(), status)
+    st.markdown(badge_html, unsafe_allow_html=True)
 
 
 def two_column_layout() -> tuple[Any, Any]:

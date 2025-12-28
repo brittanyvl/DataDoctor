@@ -223,14 +223,23 @@ def transform_date_coerce(
             - target_format: target date format
             - accepted_input_formats: list of input formats to try
             - excel_serial_enabled: bool
+            - on_parse_error: "set_null" or "keep" (default: "keep")
 
     Returns:
         Transformed series
     """
     params = params or {}
     target_format = params.get("target_format", "YYYY-MM-DD")
-    accepted_formats = params.get("accepted_input_formats", [target_format])
+    # Default to common formats if not specified
+    default_formats = [
+        "YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY", "YYYY/MM/DD",
+        "MM-DD-YYYY", "DD-MM-YYYY", "YYYYMMDD",
+        "MM/DD/YY", "DD/MM/YY", "MMM DD, YYYY", "MMMM DD, YYYY",
+        "DD-MMM-YYYY",
+    ]
+    accepted_formats = params.get("accepted_input_formats", default_formats)
     excel_serial = params.get("excel_serial_enabled", False)
+    on_error = params.get("on_parse_error", "keep")
 
     def coerce(value: Any) -> Any:
         if pd.isna(value):
@@ -243,7 +252,12 @@ def transform_date_coerce(
             excel_serial,
         )
 
-        return result if result is not None else value
+        if result is not None:
+            return result
+        elif on_error == "set_null":
+            return None  # Invalid date becomes null
+        else:
+            return value  # Keep original
 
     return series.apply(coerce)
 
