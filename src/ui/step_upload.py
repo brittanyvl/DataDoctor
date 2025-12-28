@@ -101,13 +101,16 @@ def _render_file_upload_section():
         _render_sheet_selection()
         return
 
+    # Get uploader version for key generation (used to reset uploaders on clear)
+    uploader_version = st.session_state.get("uploader_version", 0)
+
     # Primary data file uploader
     st.markdown("**Primary Data File**")
     primary_file = st.file_uploader(
         "Choose your main data file",
         type=[ext.lstrip('.') for ext in SUPPORTED_EXTENSIONS],
         help="Upload a CSV or Excel file containing your data",
-        key="primary_file_uploader",
+        key=f"primary_file_uploader_v{uploader_version}",
     )
 
     # Optional uploads section (FK file and Contract)
@@ -121,7 +124,7 @@ def _render_file_upload_section():
             "Choose contract YAML file",
             type=["yaml", "yml"],
             help="Upload a Data Doctor contract to restore import settings",
-            key="contract_file_uploader",
+            key=f"contract_file_uploader_v{uploader_version}",
         )
 
         if contract_file is not None:
@@ -138,7 +141,7 @@ def _render_file_upload_section():
             "Choose FK reference file",
             type=[ext.lstrip('.') for ext in SUPPORTED_EXTENSIONS],
             help="Optional: Upload a file containing valid FK values",
-            key="fk_file_uploader",
+            key=f"fk_file_uploader_v{uploader_version}",
         )
 
         # Handle FK file upload (only if primary is loaded)
@@ -511,6 +514,10 @@ def _clear_session():
         if key in st.session_state:
             del st.session_state[key]
 
+    # Increment uploader version to force file uploaders to reset
+    # This creates new widget instances with fresh state
+    st.session_state["uploader_version"] = st.session_state.get("uploader_version", 0) + 1
+
     # Reset current step to 1
     st.session_state["current_step"] = 1
 
@@ -570,6 +577,7 @@ def _render_column_configuration():
 
     # Import and transformation options as checkboxes
     st.markdown("**Quick Options**")
+    st.caption("Column name transformations:")
 
     col1, col2, col3 = st.columns(3)
 
@@ -582,6 +590,13 @@ def _render_column_configuration():
     with col3:
         remove_punctuation = st.checkbox("Remove punctuation", key="opt_remove_punct")
         replace_spaces = st.checkbox("Replace spaces with _", key="opt_replace_spaces")
+
+    st.caption("Row filtering:")
+    skip_total_rows = st.checkbox(
+        "Skip rows containing 'total'",
+        key="opt_skip_totals",
+        help="Remove rows where any cell contains 'total' or 'grand total' (case insensitive)"
+    )
 
     # Skip rows options
     st.markdown("**Row Options**")
@@ -633,12 +648,18 @@ def _render_column_configuration():
         if quick_options_applied:
             changes_made.append("Applied column name transformations")
 
+        # Apply skip total rows if selected
+        if skip_total_rows:
+            rows_removed = _apply_skip_total_rows()
+            if rows_removed > 0:
+                changes_made.append(f"Removed {rows_removed} rows containing 'total'")
+
         # Increment version to force widget refresh
         st.session_state["column_config_version"] = st.session_state.get("column_config_version", 0) + 1
 
         # Clear checkbox states after applying
         for key in ["opt_lowercase", "opt_uppercase", "opt_titlecase", "opt_trim",
-                    "opt_remove_punct", "opt_replace_spaces"]:
+                    "opt_remove_punct", "opt_replace_spaces", "opt_skip_totals"]:
             if key in st.session_state:
                 del st.session_state[key]
 
@@ -722,6 +743,44 @@ def _render_column_configuration():
         ignored_names = [column_renames.get(col, col) for col in columns_to_ignore if col in df.columns]
         if ignored_names:
             st.caption(f"Ignored columns (hidden from rules): {', '.join(ignored_names)}")
+
+
+def _apply_skip_total_rows() -> int:
+    """
+    Remove rows where any cell contains 'total' (case insensitive).
+
+    Returns:
+        Number of rows removed.
+    """
+    df = st.session_state.get("dataframe")
+    if df is None:
+        return 0
+
+    original_count = len(df)
+
+    # Create a mask for rows that contain 'total' in any cell
+    # Convert all cells to string and check for 'total' (case insensitive)
+    def row_contains_total(row):
+        for val in row:
+            if pd.notna(val):
+                val_str = str(val).lower()
+                if 'total' in val_str:
+                    return True
+        return False
+
+    mask = df.apply(row_contains_total, axis=1)
+
+    # Keep rows that do NOT contain 'total'
+    df_filtered = df[~mask].reset_index(drop=True)
+
+    rows_removed = original_count - len(df_filtered)
+
+    if rows_removed > 0:
+        st.session_state["dataframe"] = df_filtered
+        # Update column renames to match new dataframe
+        st.session_state["column_renames"] = {col: col for col in df_filtered.columns}
+
+    return rows_removed
 
 
 def _apply_quick_options(

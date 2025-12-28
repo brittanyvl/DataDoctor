@@ -12,11 +12,7 @@ from typing import Optional
 # Pattern preset definitions
 # Each preset is a tuple of (pattern, description, example)
 REGEX_PRESETS = {
-    "uuid": (
-        r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-        "Universally Unique Identifier (UUID)",
-        "550e8400-e29b-41d4-a716-446655440000",
-    ),
+    # Common formats
     "email": (
         r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
         "Email address",
@@ -42,6 +38,11 @@ REGEX_PRESETS = {
         "URL (HTTP or HTTPS)",
         "https://example.com/path",
     ),
+    "uuid": (
+        r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        "Universally Unique Identifier (UUID)",
+        "550e8400-e29b-41d4-a716-446655440000",
+    ),
     "ipv4": (
         r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
         "IPv4 address",
@@ -60,7 +61,50 @@ REGEX_PRESETS = {
         "IPv6 address",
         "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
     ),
+    # Character type patterns
+    "numeric_only": (
+        r"^\d+$",
+        "Numbers only (0-9)",
+        "12345",
+    ),
+    "alphanumeric_only": (
+        r"^[a-zA-Z0-9]+$",
+        "Letters and numbers only",
+        "ABC123",
+    ),
+    "letters_only": (
+        r"^[a-zA-Z]+$",
+        "Letters only (A-Z, a-z)",
+        "Hello",
+    ),
 }
+
+# Human-readable display names for UI dropdown (in order)
+# Format: internal_key -> display_name
+PATTERN_DISPLAY_NAMES = {
+    "email": "Email Address (e.g., user@example.com)",
+    "phone_us": "US Phone Number (e.g., 555-123-4567)",
+    "zip_us_5": "US ZIP Code - 5 Digit (e.g., 12345)",
+    "zip_us_9": "US ZIP Code - 9 Digit (e.g., 12345-6789)",
+    "url": "Web URL (e.g., https://example.com)",
+    "uuid": "UUID / GUID (e.g., 550e8400-e29b-...)",
+    "ipv4": "IP Address v4 (e.g., 192.168.1.1)",
+    "ipv6": "IP Address v6",
+    "numeric_only": "Numeric Only - digits 0-9 (e.g., 12345)",
+    "alphanumeric_only": "Alphanumeric Only - letters & numbers (e.g., ABC123)",
+    "letters_only": "Letters Only - A-Z (e.g., Hello)",
+    # Builder patterns - displayed at end
+    "starts_with": "Starts With... (specify prefix)",
+    "ends_with": "Ends With... (specify suffix)",
+    "contains": "Contains... (specify text)",
+    "custom": "Custom Pattern (advanced)",
+}
+
+# Reverse mapping
+PATTERN_DISPLAY_TO_KEY = {v: k for k, v in PATTERN_DISPLAY_NAMES.items()}
+
+# Which patterns need additional input
+PATTERNS_REQUIRING_INPUT = {"starts_with", "ends_with", "contains", "custom"}
 
 
 # Compiled patterns cache
@@ -175,12 +219,48 @@ def validate_with_custom_pattern(value: str, pattern_str: str) -> bool:
 
 def get_all_preset_names() -> list[str]:
     """
-    Get all available preset names.
+    Get all available preset names (internal keys).
 
     Returns:
         List of preset names
     """
     return list(REGEX_PRESETS.keys())
+
+
+def get_all_pattern_display_names() -> list[str]:
+    """
+    Get all pattern display names for UI dropdown.
+
+    Returns:
+        List of human-readable pattern names in order
+    """
+    return list(PATTERN_DISPLAY_NAMES.values())
+
+
+def get_pattern_key_from_display(display_name: str) -> str:
+    """
+    Convert a display name back to internal key.
+
+    Args:
+        display_name: The human-readable display name
+
+    Returns:
+        Internal pattern key
+    """
+    return PATTERN_DISPLAY_TO_KEY.get(display_name, display_name)
+
+
+def pattern_requires_input(pattern_key: str) -> bool:
+    """
+    Check if a pattern requires additional user input.
+
+    Args:
+        pattern_key: The internal pattern key
+
+    Returns:
+        True if pattern needs additional input
+    """
+    return pattern_key in PATTERNS_REQUIRING_INPUT
 
 
 def get_preset_info() -> list[dict]:

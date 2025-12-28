@@ -126,7 +126,7 @@ UOM_ANSI_X12 = {
     "HR", "DA", "WK", "MO", "YR",
 }
 
-# Preset name to set mapping
+# Preset name to set mapping (internal keys)
 ENUM_PRESETS = {
     "us_state_2_letter": US_STATE_2_LETTER,
     "us_state_full_name": US_STATE_FULL_NAME,
@@ -135,6 +135,19 @@ ENUM_PRESETS = {
     "uom_ansi_packaging": UOM_ANSI_PACKAGING,
     "uom_ansi_x12": UOM_ANSI_X12,
 }
+
+# Human-readable display names for UI dropdown
+ENUM_PRESET_DISPLAY_NAMES = {
+    "us_state_2_letter": "US States - 2 Letter (e.g., AK for Alaska)",
+    "us_state_full_name": "US States - Full Name (e.g., Alaska)",
+    "us_state_code_or_name": "US States - Code or Name (e.g., AK or Alaska)",
+    "country_iso3166_alpha2": "Country Codes - ISO 2 Letter (e.g., US, CA, GB)",
+    "uom_ansi_packaging": "Units of Measure - Packaging (e.g., EA, BX, CS)",
+    "uom_ansi_x12": "Units of Measure - Extended (e.g., EA, LB, GL)",
+}
+
+# Reverse mapping from display name to internal key
+ENUM_DISPLAY_TO_KEY = {v: k for k, v in ENUM_PRESET_DISPLAY_NAMES.items()}
 
 
 def get_enum_preset(preset_name: str) -> Optional[set[str]]:
@@ -202,12 +215,35 @@ def validate_with_custom_enum(
 
 def get_all_enum_preset_names() -> list[str]:
     """
-    Get all available enum preset names.
+    Get all available enum preset names (internal keys).
 
     Returns:
         List of preset names
     """
     return list(ENUM_PRESETS.keys())
+
+
+def get_all_enum_preset_display_names() -> list[str]:
+    """
+    Get all available enum preset display names for UI.
+
+    Returns:
+        List of human-readable preset names
+    """
+    return list(ENUM_PRESET_DISPLAY_NAMES.values())
+
+
+def get_enum_key_from_display(display_name: str) -> str:
+    """
+    Convert a display name back to internal key.
+
+    Args:
+        display_name: The human-readable display name
+
+    Returns:
+        Internal preset key
+    """
+    return ENUM_DISPLAY_TO_KEY.get(display_name, display_name)
 
 
 def get_enum_preset_info() -> list[dict]:

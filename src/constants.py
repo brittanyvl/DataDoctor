@@ -49,6 +49,18 @@ FAILURE_ACTIONS = [
     "drop_row",
 ]
 
+# Human-readable failure action names for UI display
+FAILURE_ACTION_LABELS = {
+    "strict_fail": "Strict Failure: Stop Processing",
+    "set_null": "Set to Null: Clear Invalid Values",
+    "label_failure": "Label Failure: Mark and Continue",
+    "quarantine_row": "Quarantine Row: Move to Separate Output",
+    "drop_row": "Drop Row: Remove from Output",
+}
+
+# Reverse mapping from label to action
+FAILURE_LABEL_TO_ACTION = {v: k for k, v in FAILURE_ACTION_LABELS.items()}
+
 # Regex pattern tiers (Section 21.1.1)
 REGEX_TIERS = ["preset", "builder", "advanced"]
 
