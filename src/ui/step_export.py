@@ -35,7 +35,7 @@ def render_step_export():
 
     # Show demo tip if in demo mode
     demo_tip(
-        "Download the complete package to see all outputs including the PDF report. "
+        "Download the complete package to see all outputs including the HTML report. "
         "In demo mode, you can start over anytime with 'Clear Session' in the sidebar."
     )
 
@@ -80,7 +80,7 @@ def render_step_export():
             xlsx_multi_sheet = st.checkbox(
                 "Combine data into one Excel file with multiple sheets",
                 value=True,
-                help="If checked, labeled data and cleaned data will be on separate sheets in one .xlsx file. Otherwise, they will be separate files.",
+                help="If checked and multiple data files are included, they will be on separate sheets in one .xlsx file. Otherwise, they will be separate files.",
             )
 
     # Download Complete Package (primary action - first)
@@ -158,6 +158,30 @@ def _render_contract_export(contract, base_name):
         st.code(yaml_content, language="yaml")
 
 
+def _has_label_failure_action(contract) -> bool:
+    """Check if any field in the contract uses the label_failure action."""
+    # Check column failure handling
+    for col in contract.columns:
+        if col.failure_handling and col.failure_handling.action == "label_failure":
+            return True
+        # Check column-level tests
+        for test in col.tests:
+            if test.on_fail and test.on_fail.action == "label_failure":
+                return True
+
+    # Check dataset-level tests
+    for test in contract.dataset_tests:
+        if test.on_fail and test.on_fail.action == "label_failure":
+            return True
+
+    # Check foreign key checks
+    for fk in contract.foreign_key_checks:
+        if fk.on_fail and fk.on_fail.action == "label_failure":
+            return True
+
+    return False
+
+
 def _render_zip_download(df, contract, validation_result, original_filename, base_name, format_ext, xlsx_multi_sheet):
     """Render the main zip download button."""
     st.subheader("Download Complete Package")
@@ -168,15 +192,29 @@ def _render_zip_download(df, contract, validation_result, original_filename, bas
     remediation_diff = st.session_state.get("remediation_diff")
 
     # Build list of what's included
-    included_items = ["Labeled data (with error columns)", "Data quality report (PDF)", "Validation rules (YAML)"]
+    included_items = []
+
+    # Add cleaned dataset if available (primary output)
     if remediated_df is not None:
-        included_items.insert(1, "Cleaned data")
+        included_items.append("Final cleaned dataset")
+
+    # Add HTML report
     if remediation_diff and remediation_diff.cells_changed > 0:
-        included_items[1] = "Data quality report with cleansing summary (PDF)"
+        included_items.append("Personalized HTML report with data quality results and cleansing summary")
+    else:
+        included_items.append("Personalized HTML report with data quality results")
+
+    # Add YAML contract
+    included_items.append("YAML data contract to reuse settings from this session")
+
+    # Add labeled data only if user selected label_failure action
+    if _has_label_failure_action(contract):
+        included_items.append("Labeled original dataset (with error columns)")
 
     info_box("**Included in download:**\n- " + "\n- ".join(included_items))
 
     # Generate zip
+    include_labeled = _has_label_failure_action(contract)
     zip_bytes = _create_export_zip(
         labeled_df=labeled_df,
         remediated_df=remediated_df,
@@ -187,6 +225,7 @@ def _render_zip_download(df, contract, validation_result, original_filename, bas
         base_name=base_name,
         format_ext=format_ext,
         xlsx_multi_sheet=xlsx_multi_sheet,
+        include_labeled=include_labeled,
     )
 
     st.download_button(
@@ -209,28 +248,31 @@ def _create_export_zip(
     base_name,
     format_ext,
     xlsx_multi_sheet,
+    include_labeled=False,
 ):
     """Create a zip file containing all export artifacts."""
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         # Handle data exports
-        if format_ext == "xlsx" and xlsx_multi_sheet and remediated_df is not None:
-            # Combine into single xlsx with multiple sheets
+        if format_ext == "xlsx" and xlsx_multi_sheet and remediated_df is not None and include_labeled:
+            # Combine into single xlsx with multiple sheets (only if both are included)
             xlsx_buffer = io.BytesIO()
             with pd.ExcelWriter(xlsx_buffer, engine="openpyxl") as writer:
-                labeled_df.to_excel(writer, sheet_name="Labeled Data", index=False)
                 remediated_df.to_excel(writer, sheet_name="Cleaned Data", index=False)
+                labeled_df.to_excel(writer, sheet_name="Labeled Data", index=False)
             xlsx_buffer.seek(0)
             zf.writestr(f"{base_name}_data.xlsx", xlsx_buffer.read())
         else:
-            # Separate files
-            labeled_bytes, ext, _ = export_dataframe(labeled_df, output_format=format_ext, escape_formulas=True)
-            zf.writestr(f"{base_name}_labeled{ext}", labeled_bytes)
-
+            # Separate files - always include cleaned data if available
             if remediated_df is not None:
                 cleaned_bytes, ext, _ = export_dataframe(remediated_df, output_format=format_ext, escape_formulas=True)
                 zf.writestr(f"{base_name}_cleaned{ext}", cleaned_bytes)
+
+            # Only include labeled data if label_failure action is used
+            if include_labeled:
+                labeled_bytes, ext, _ = export_dataframe(labeled_df, output_format=format_ext, escape_formulas=True)
+                zf.writestr(f"{base_name}_labeled{ext}", labeled_bytes)
 
         # HTML Report (includes data cleansing summary if available)
         report_bytes = generate_html_report_bytes(
