@@ -117,19 +117,22 @@ The persistent sidebar provides constant orientation:
 
 #### Cross-Field Validation
 
-Define logical rules that span multiple columns:
+Some data quality issues only become visible when you compare columns against each other. Data Doctor's cross-field validation lets you create **unlimited custom rules** using a visual expression builder—no coding required.
 
-```yaml
-# Example: Ship date must be on or after order date
-cross_field_rule:
-  rule_name: "Ship date after order date"
-  if:
-    all_not_null: ["order_date", "ship_date"]
-  assert:
-    expression: "order_date <= ship_date"
-```
+**How it works**: Select two columns, choose a comparison operator, and Data Doctor flags any rows that violate your rule.
 
-> **Design Decision**: Separating column-level from dataset-level tests mirrors how data professionals think about quality—individual field validity vs. relational integrity.
+| Example Rule | What It Catches |
+|--------------|-----------------|
+| `ship_date >= order_date` | Orders marked as shipped before they were placed |
+| `end_date >= start_date` | Projects or events with impossible timelines |
+| `sale_price <= list_price` | Discounts that accidentally exceed 100% |
+| `quantity > 0` | Zero or negative quantities that shouldn't exist |
+| `actual_cost <= budget` | Line items that exceeded their budget |
+| `hire_date <= termination_date` | Employee records with timeline errors |
+
+**Real-world example**: An e-commerce company imports order data monthly. Individual columns look fine—dates are valid dates, prices are valid numbers. But cross-field validation reveals 47 rows where `ship_date` is *before* `order_date`—a data entry error that would have gone unnoticed.
+
+> **Design Decision**: Cross-field rules catch the errors that slip through single-column validation. The visual builder makes complex logic accessible to non-technical users while the underlying engine handles null-safety automatically.
 
 ### Pattern Validation
 
