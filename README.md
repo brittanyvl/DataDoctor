@@ -70,7 +70,7 @@ Data Doctor uses a **medical metaphor** to make data quality approachable:
 
 | 5 | **Download Reports** | Export cleaned data, reports, and reusable contracts |
 
-![Data Doctor Interface](assets/screenshots/Step5_1.png)
+![Data Doctor Interface](assets/screenshots/step5_1.png)
 ![Data Doctor HTML Report](assets/screenshots/htmlreport_1.png)
 ![Data Doctor YAML Contract](assets/screenshots/yamlcontract.png)
 
