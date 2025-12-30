@@ -374,6 +374,8 @@ Privacy-first architecture eliminates entire categories of concerns: no database
 
 Users expect to save their work. Traditional approaches require user accounts and database storage. YAML contracts provide portability and persistence while maintaining zero server-side data retention. Bonus: they're version-controllable in Git.
 
+We chose YAML over JSON because YAML is less intimidating to non-technical users—no curly braces, no quotation marks on keys, and the indentation-based structure reads more like a natural outline.
+
 ### Why a Medical Metaphor?
 
 "Data Check-In," "Diagnostics," and "Treatments" are more approachable than "ETL Pipeline Configuration." The metaphor guides users through an unfamiliar process with familiar concepts.
