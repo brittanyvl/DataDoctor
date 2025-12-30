@@ -108,17 +108,12 @@ The persistent sidebar provides constant orientation:
 | `date_rule` | Date format consistency | Dates must be YYYY-MM-DD |
 | `date_window` | Date range validation | Order date within last 2 years |
 
-#### Dataset-Level Tests (7 types)
+#### Dataset-Level Tests
 
 | Test | Purpose |
 |------|---------|
-| `duplicate_rows` | Find exact duplicate records |
-| `primary_key_completeness` | Ensure key columns have no nulls |
-| `primary_key_uniqueness` | Verify key combinations are unique |
-| `composite_key_uniqueness` | Multi-column uniqueness checks |
-| `cross_field_rule` | Logical relationships between columns |
-| `outliers_iqr` | Statistical outlier detection (IQR method) |
-| `outliers_zscore` | Statistical outlier detection (Z-score method) |
+| `duplicate_rows` | Find exact duplicate records across the entire dataset |
+| `cross_field_rule` | Validate logical relationships between columns |
 
 #### Cross-Field Validation
 
@@ -136,36 +131,44 @@ cross_field_rule:
 
 > **Design Decision**: Separating column-level from dataset-level tests mirrors how data professionals think about quality—individual field validity vs. relational integrity.
 
-### 3-Tier Regex Pattern System
+### Pattern Validation
 
-Pattern validation scales to user expertise:
+Data Doctor provides preset patterns for common data formats, plus flexible options for custom needs:
 
-**Tier 1: Preset Patterns** — One-click selection for common formats
-- Email, US Phone, ZIP codes (5 and 9 digit)
-- URLs, UUIDs, IPv4/IPv6 addresses
-- Numeric-only, alphanumeric, letters-only
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| **Email** | Email address validation | user@example.com |
+| **US Phone** | US phone with optional formatting | (555) 123-4567, +1-555-123-4567 |
+| **ZIP Code (5-digit)** | US 5-digit ZIP | 12345 |
+| **ZIP Code (9-digit)** | US ZIP+4 format | 12345-6789 |
+| **URL** | HTTP/HTTPS web addresses | https://example.com/path |
+| **UUID** | Universally Unique Identifier | 550e8400-e29b-41d4-a716-446655440000 |
+| **IPv4** | IP address version 4 | 192.168.1.1 |
+| **IPv6** | IP address version 6 | 2001:0db8:85a3::8a2e:0370:7334 |
+| **Numeric Only** | Digits 0-9 only | 12345 |
+| **Alphanumeric** | Letters and numbers only | ABC123 |
+| **Letters Only** | A-Z characters only | Hello |
+| **Starts With...** | Specify required prefix | Values starting with "INV-" |
+| **Ends With...** | Specify required suffix | Values ending with ".pdf" |
+| **Contains...** | Specify required substring | Values containing "2024" |
+| **Custom Regex** | Full regex pattern support | Any valid regular expression |
 
-**Tier 2: Pattern Builder** — Visual construction without regex knowledge
-- Select allowed character types (digits, letters, etc.)
-- Set length constraints (exact, min, max)
-- Define required prefixes/suffixes
-
-**Tier 3: Custom Regex** — Full regex support for advanced users
-
-> **Design Decision**: Progressive complexity ensures non-technical users aren't intimidated while power users retain full control.
+> **Design Decision**: Preset patterns handle 90% of use cases with one click. The "Starts With/Ends With/Contains" options help non-technical users without learning regex. Power users can still write custom patterns.
 
 ### Data Cleansing Options
 
-14 remediation transformers handle common data issues:
+Remediation transformers to fix common data issues:
 
-| Category | Transformers |
-|----------|-------------|
-| **Text Cleanup** | trim_whitespace, normalize_case, remove_punctuation, remove_non_printable |
-| **Null Handling** | standardize_nulls, fill_null |
-| **Numeric** | numeric_cleanup (currency, commas, percentages), clamp_range |
-| **Type Coercion** | boolean_normalization, date_coerce |
-| **Categorical** | categorical_standardize (value mapping) |
-| **Structural** | split_column, deduplicate_rows |
+| Transformer | What It Does |
+|-------------|--------------|
+| **Trim Whitespace** | Remove leading/trailing spaces from text |
+| **Normalize Case** | Convert to lowercase, UPPERCASE, or Title Case |
+| **Remove Punctuation** | Strip punctuation marks from text |
+| **Remove Non-Printable** | Remove hidden control characters |
+| **Standardize Nulls** | Convert "NA", "N/A", "null", "" to actual null values |
+| **Numeric Cleanup** | Remove currency symbols ($), commas, and percentage signs |
+| **Boolean Normalization** | Standardize yes/no/true/false/1/0 to consistent format |
+| **Date Coercion** | Convert dates to a standard format (e.g., YYYY-MM-DD) |
 
 **Failure Handling Strategies:**
 
