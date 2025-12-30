@@ -85,8 +85,6 @@ The persistent sidebar provides constant orientation:
 - **Clear Session** — One-click reset with celebratory feedback
 - **Privacy notice** — Constant reminder that your data stays in-memory
 
-
-Screenshot placeholder:
 ![Sidebar Navigation](assets/screenshots/sidebar.png)
 
 
